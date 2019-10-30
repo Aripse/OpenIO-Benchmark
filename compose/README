@@ -1,0 +1,10 @@
+# Pour lancer l'install :
+
+sudo chmod 750 script_install_cluster.sh
+sudo ./script_install_cluster.sh
+
+# Une fois tout installé, a chaque fois qu'on veut lancer le cluster :
+
+docker-compose up
+
+#Il faut obligatoirement être dans le dossier avec le docker-compose.yml car c'est lui qui est lu par la commande

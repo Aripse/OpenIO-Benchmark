@@ -1,0 +1,30 @@
+version: "3.7"
+
+services:
+  openio_1:
+    container_name: "node1"
+    image: "openio/sds:19.04"
+    restart: on-failure
+    ports :
+      - "6007:6007"
+
+  openio_2:
+    container_name: "node2"
+    image: "openio/sds:19.04"
+    restart: on-failure
+    ports :
+      - "6008:6008"
+    depends_on: 
+      - openio_1
+    command: bash -c "sleep 40; /bin/bash /openio-docker-init.sh"
+
+  openio_3:
+    container_name: "node3"
+    image: "openio/sds:19.04"
+    restart: on-failure
+    ports :
+      - "6009:6009"
+    depends_on:
+      - openio_2
+    command: bash -c "sleep 80; /bin/bash /openio-docker-init.sh"
+
