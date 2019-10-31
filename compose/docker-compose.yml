@@ -5,6 +5,8 @@ services:
     container_name: "node1"
     image: "openio/sds:19.04"
     restart: on-failure
+    volumes:
+      - /home/$USERNAME/scripts:/scripts:z
     ports :
       - "6007:6007"
 
