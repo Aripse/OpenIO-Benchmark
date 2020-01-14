@@ -21,7 +21,7 @@ s.object_create("my_ac2", "node1", obj_name="essai.txt",data=data)
 
 #retrieving object
 meta, stream = s.object_fetch("my_ac2","node1", "essai.txt")
-print "".join(stream)
+print (b" ".join(stream))
 
 #deleting objects
 s.object_delete("my_ac2", "node1", "essai.txt")
