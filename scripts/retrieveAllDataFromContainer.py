@@ -1,5 +1,7 @@
 from oio import ObjectStorageApi
 from oio.account.client import AccountClient
+import argparse
+import os
 
 
 def retrieveAllDataFromContainer(client, container):
@@ -11,6 +13,7 @@ def retrieveAllDataFromContainer(client, container):
         with open(element['name'], 'w+b') as e:
             e.write(b"".join(stream))
 
+ac = AccountClient({"namespace": "OPENIO"})
 
 parser = argparse.ArgumentParser(
     description='Retrieve all the files from a certain container and a certain client.')
@@ -23,4 +26,4 @@ parser.add_argument('container', type=str, nargs='?',
 
 args = parser.parse_args()
 
-addFileInContainer(args.client, args.container)
+retrieveAllDataFromContainer(args.client, args.container)

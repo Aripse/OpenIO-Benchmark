@@ -14,6 +14,8 @@ def addFileInContainer(client, container, path):
         s.object_create(client, container, obj_name=fileName, data=f)
         meta, stream = s.object_fetch(client, container, fileName)
 
+ac = AccountClient({"namespace": "OPENIO"})
+
 
 parser = argparse.ArgumentParser(
     description='Put a file in the container you desire and for a specific account for a client.')

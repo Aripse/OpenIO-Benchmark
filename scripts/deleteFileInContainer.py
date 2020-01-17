@@ -1,10 +1,14 @@
 from oio import ObjectStorageApi
 from oio.account.client import AccountClient
+import argparse
+import os
 
 
 def deleteFileInContainer(client, container, fileName):
     s = ObjectStorageApi("OPENIO")
-    s.object_delete(client, container, filename)
+    s.object_delete(client, container, fileName)
+
+ac = AccountClient({"namespace": "OPENIO"})
 
 
 parser = argparse.ArgumentParser(
@@ -21,4 +25,4 @@ parser.add_argument('fileName', type=str, nargs='?',
 
 args = parser.parse_args()
 
-addFileInContainer(args.client, args.container, args.fileName)
+deleteFileInContainer(args.client, args.container, args.fileName)

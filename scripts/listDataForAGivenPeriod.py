@@ -1,6 +1,8 @@
 from oio import ObjectStorageApi
 from oio.account.client import AccountClient
 from datetime import date, timedelta, datetime
+import argparse
+import os
 
 
 def retrieveDataForAGivenPeriod(client, container, period):
@@ -20,6 +22,8 @@ def retrieveDataForAGivenPeriod(client, container, period):
 
     print(objects)
 
+ac = AccountClient({"namespace": "OPENIO"})
+
 
 parser = argparse.ArgumentParser(
     description='Prints a list of files for a given period in the container you desire and for a specific account for a client.')
@@ -35,4 +39,4 @@ parser.add_argument('period', type=int, nargs='?',
 
 args = parser.parse_args()
 
-addFileInContainer(args.client, args.container, args.period)
+retrieveDataForAGivenPeriod(args.client, args.container, args.period)
