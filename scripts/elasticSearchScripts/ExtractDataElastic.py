@@ -32,12 +32,17 @@ except ImportError:
         os.system("pip3 install --user glob")
         import glob
 try:
+    import gzip
+except ImportError:
+        input("Cannot load module gzip. Press enter to install the package gzip or Ctrl+c to quit the program")
+        os.system("pip3 install --user gzip")
+        import gzip
+try:
     from elasticsearch import Elasticsearch, helpers
 except ImportError:
         input("Cannot load module Elasticsearch. Press enter to install the package Elasticsearch or Ctrl+c to quit the program")
         os.system("pip3 install --user Elasticsearch")
         from elasticsearch import Elasticsearch, helpers
-
 
 def current_path():
     return os.path.dirname(os.path.realpath( __file__ ))
@@ -117,14 +122,15 @@ def extract_save_file(save_path, client):
         # get _source data dict from document
         source_data = doc["_source"]
         complete_name = os.path.join(save_path, source_data["file_name"])
-        file = open(complete_name, "w")
-        data = source_data["data"]
-        file.write(data)
-        file.close()
+        file = open(complete_name, "w+")
+        try:
+            file.write(source_data["data"])
+        finally:
+            file.close()
 
 if __name__ == "__main__":
     #Initialize variables
-    DOMAIN='192.168.43.187'
+    DOMAIN='localhost'
     PORT=9200
     start_time = time.time()
      # posix uses "/", and Windows uses ""
