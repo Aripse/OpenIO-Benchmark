@@ -5,8 +5,9 @@ import argparse
 import os
 
 
-def retrieveDataForAGivenPeriod(client, container, period):
-    s = ObjectStorageApi("OPENIO")
+def retrieveDataForAGivenPeriod(container, period):
+    s = ObjectStorageApi("OPENIO", endpoint="http://169.254.205.203:6006")
+    client="admin"
     objects = []
     t = timedelta(days=period)
 
@@ -28,9 +29,6 @@ ac = AccountClient({"namespace": "OPENIO"})
 parser = argparse.ArgumentParser(
     description='Prints a list of files for a given period in the container you desire and for a specific account for a client.')
 
-parser.add_argument('client', type=str, nargs='?',
-                    help='The name of the client you want to associate these file')
-
 parser.add_argument('container', type=str, nargs='?',
                     help='The container you want to check the file in')
 
@@ -39,4 +37,4 @@ parser.add_argument('period', type=int, nargs='?',
 
 args = parser.parse_args()
 
-retrieveDataForAGivenPeriod(args.client, args.container, args.period)
+retrieveDataForAGivenPeriod(args.container, args.period)
