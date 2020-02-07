@@ -4,18 +4,13 @@ import argparse
 import os
 
 
-def deleteFileInContainer(client, container, fileName):
-    s = ObjectStorageApi("OPENIO")
+def deleteFileInContainer(container, fileName):
+    s = ObjectStorageApi("OPENIO", endpoint="http://169.254.205.203:6006")
+    client="admin"
     s.object_delete(client, container, fileName)
-
-ac = AccountClient({"namespace": "OPENIO"})
-
 
 parser = argparse.ArgumentParser(
     description='Delete a file in the container you desire and for a specific account for a client.')
-
-parser.add_argument('client', type=str, nargs='?',
-                    help='The name of the client you want to associate this file')
 
 parser.add_argument('container', type=str, nargs='?',
                     help='The container you want to put the file in')
@@ -25,4 +20,4 @@ parser.add_argument('fileName', type=str, nargs='?',
 
 args = parser.parse_args()
 
-deleteFileInContainer(args.client, args.container, args.fileName)
+deleteFileInContainer(args.container, args.fileName)
