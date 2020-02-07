@@ -2,8 +2,8 @@ from oio import ObjectStorageApi
 from oio.account.client import AccountClient
 
 
-s = ObjectStorageApi("OPENIO")
-ac = AccountClient({"namespace": "OPENIO"})
+s = ObjectStorageApi("OPENIO", endpoint="http://169.254.205.203:6006")
+ac = AccountClient({"namespace": "OPENIO"}, proxy_endpoint="http://169.254.205.203:6006")
 
 with open('./Move/Halloween.mp3', 'rb') as f:
 
@@ -12,4 +12,3 @@ with open('./Move/Halloween.mp3', 'rb') as f:
 
     with open('./newfile.mp3', 'w+b') as e:
         e.write(b"".join(stream))
-
