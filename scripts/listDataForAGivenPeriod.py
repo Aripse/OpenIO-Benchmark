@@ -4,10 +4,16 @@ from datetime import date, timedelta, datetime
 import argparse
 import os
 
+import yaml
 
-def retrieveDataForAGivenPeriod(container, period):
-    s = ObjectStorageApi("OPENIO", endpoint="http://169.254.205.203:6006")
-    client="admin"
+with open("./config.yaml", "r") as ymlfile:
+    config = yaml.load(ymlfile,  Loader=yaml.FullLoader)
+
+def retrieveDataForAGivenPeriod(client, container, period):
+    if config['endpoint'] != "":
+        s = ObjectStorageApi(config["AccountClientNamespace"], endpoint=config['endpoint'])
+    else:
+        s = ObjectStorageApi(config["AccountClientNamespace"])
     objects = []
     t = timedelta(days=period)
 
@@ -23,7 +29,7 @@ def retrieveDataForAGivenPeriod(container, period):
 
     print(objects)
 
-ac = AccountClient({"namespace": "OPENIO"})
+ac = AccountClient({"namespace": config["AccountClientNamespace"]})
 
 
 parser = argparse.ArgumentParser(
@@ -32,9 +38,12 @@ parser = argparse.ArgumentParser(
 parser.add_argument('container', type=str, nargs='?',
                     help='The container you want to check the file in')
 
+parser.add_argument('client', type=str, nargs='?',
+                    help='The name of the client you want to associate these file')
+
 parser.add_argument('period', type=int, nargs='?',
                     help='The period you want to check the files in')
 
 args = parser.parse_args()
 
-retrieveDataForAGivenPeriod(args.container, args.period)
+retrieveDataForAGivenPeriod(args.client, args.container, args.period)

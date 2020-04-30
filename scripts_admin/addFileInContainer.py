@@ -8,9 +8,6 @@ def addFileInContainer(container, path):
     s = ObjectStorageApi("OPENIO")
     client="admin"
     fileName = os.path.basename(path)
-    print(client)
-    print(container)
-    print(path)
     with open(path, 'rb') as f:
         s.object_create(client, container, obj_name=fileName, data=f)
         meta, stream = s.object_fetch(client, container, fileName)

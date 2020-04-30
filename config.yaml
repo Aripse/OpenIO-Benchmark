@@ -1,0 +1,5 @@
+
+
+accountClient: "OPENIO"
+client: "admin"
+endpoint: "http://169.254.205.203:6006"
