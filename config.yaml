@@ -1,5 +1,5 @@
 
 
-accountClient: "OPENIO"
+AccountClientNamespace: "OPENIO"
 client: "admin"
-endpoint: "http://169.254.205.203:6006"
+endpoint: ""
