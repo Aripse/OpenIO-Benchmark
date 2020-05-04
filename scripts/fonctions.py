@@ -1,18 +1,35 @@
 import os
+from datetime import date, timedelta, datetime
 
 try:
-    import eventlet;
+    import eventlet
 except ImportError:
-        input("Cannot load module eventlet. Press enter to install the package eventlet or Ctrl+c to quit the program")
-        os.system("pip3 install --user eventlet")
-	import eventlet
+    input("Cannot load module eventlet. Press enter to install the package eventlet or Ctrl+c to quit the program")
+    os.system("pip3 install --user eventlet")
+    import eventlet
 
 try:
-    import urllib3;
+    import urllib3
 except ImportError:
         input("Cannot load module urllib3. Press enter to install the package urllib3 or Ctrl+c to quit the program")
         os.system(" pip3 install --user urllib3")
         import urllib3
+
+try:
+    import yaml
+except ImportError:
+        input("Cannot load module yaml. Press enter to install the package yaml or Ctrl+c to quit the program")
+        os.system("pip3 install --user pyyaml")
+        import yaml
+
+
+
+try:
+    import os.path
+except ImportError:
+        input("Cannot load module os.path. Press enter to install the package os.path or Ctrl+c to quit the program")
+        os.system("pip3 install --user os.path")
+        import os.path
 
 try:
     from oio import ObjectStorageApi
@@ -28,26 +45,9 @@ except ImportError:
         os.system("pip3 install  --user git+https://github.com/open-io/oio-sds.git@6.1.0.0a0")
         from oio.account.client import AccountClient
 
-try:
-    import argparse
-except ImportError:
-        input("Cannot load module argparse. Press enter to install the package argparse or Ctrl+c to quit the program")
-        os.system("pip3 install --user argparse")
-        import argparse
 
-try:
-    import os.path
-except ImportError:
-        input("Cannot load module os.path. Press enter to install the package os.path or Ctrl+c to quit the program")
-        os.system("pip3 install --user os.path")
-        import os.path
 
-try:
-    import yaml
-except ImportError:
-        input("Cannot load module yaml. Press enter to install the package yaml or Ctrl+c to quit the program")
-        os.system("pip3 install --user pyyaml")
-        import yaml
+
 
 
 with open("./config.yaml", "r") as ymlfile:
