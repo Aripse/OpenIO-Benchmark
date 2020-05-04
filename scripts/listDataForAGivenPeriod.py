@@ -9,7 +9,7 @@ import yaml
 with open("./config.yaml", "r") as ymlfile:
     config = yaml.load(ymlfile,  Loader=yaml.FullLoader)
 
-def retrieveDataForAGivenPeriod(client, container, period):
+def listDataForAGivenPeriod(client, container, period):
     if config['endpoint'] != "":
         s = ObjectStorageApi(config["AccountClientNamespace"], endpoint=config['endpoint'])
     else:

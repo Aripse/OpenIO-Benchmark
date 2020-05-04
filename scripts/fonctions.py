@@ -87,7 +87,7 @@ def uploadFolder(client, container, folder_path):
         with open('./'+file_name+file_extension, 'w+b') as e:
             e.write(b"".join(stream))
 
-def retrieveDataForAGivenPeriod(client, container, period):
+def listDataForAGivenPeriod(client, container, period):
     if config['endpoint'] != "":
         s = ObjectStorageApi(config["AccountClientNamespace"], endpoint=config['endpoint'])
     else:
