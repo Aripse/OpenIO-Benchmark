@@ -22,15 +22,6 @@ except ImportError:
         os.system("pip3 install --user pyyaml")
         import yaml
 
-
-
-try:
-    import os.path
-except ImportError:
-        input("Cannot load module os.path. Press enter to install the package os.path or Ctrl+c to quit the program")
-        os.system("pip3 install --user os.path")
-        import os.path
-
 try:
     from oio import ObjectStorageApi
 except ImportError:
@@ -38,16 +29,7 @@ except ImportError:
         os.system("pip3 install --user git+https://github.com/open-io/oio-sds.git@6.1.0.0a0")
         from oio import ObjectStorageApi
 
-try:
-    from oio.account.client import AccountClient
-except ImportError:
-        input("Cannot load module AccountClient from oio.account.client. Press enter to install the package oio or Ctrl+c to quit the program")
-        os.system("pip3 install  --user git+https://github.com/open-io/oio-sds.git@6.1.0.0a0")
-        from oio.account.client import AccountClient
-
-
-
-
+from oio.account.client import AccountClient
 
 
 with open("./config.yaml", "r") as ymlfile:
