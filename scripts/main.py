@@ -22,9 +22,6 @@ parser.add_argument('method',type=str, nargs='?')
 parser.add_argument('--container', type=str, nargs='?',
                     help='The container you want to put the file in')
 
-parser.add_argument('--client', type=str, nargs='?',
-                    help='The client you for whom you want to add the file')
-
 parser.add_argument('--path', type=str, nargs='?',
                     help='The path of the file you want to put inside the cluster')
 
@@ -36,8 +33,8 @@ parser.add_argument('--filename', type=str, nargs='?',
 
 args=parser.parse_args()
 
-if not args.container or not args.client:
-	print("You must have a container parameter and a client parameter for the function to work smoothly.")
+if not args.container:
+	print("You must have a container parameter for the function to work smoothly.")
 elif not config['AccountClientNamespace']:
 	print("The AccountClientNamespace attribute does not exist in the configuration file. Please add it.")
 else:
@@ -48,12 +45,12 @@ else:
 			print(" ", end="")
 			print("Running the function AddFileInContainer with the parameters below :")
 			print(" - container : "+ args.container)
-			print(" - client : "+ args.client)
+			print(" - client : "+ config['client'])
 			print(" - path : "+ args.path)
 			print(" - namespace : "+ config['AccountClientNamespace'])
 			print(" - endpoint : "+ config['endpoint'])
 			input("Press Enter to continue...")
-			fonctions.addFileInContainer(args.container, args.path, args.client)
+			fonctions.addFileInContainer(args.container, args.path, config['client'])
 
 	elif(args.method == "delete"):
 		if not args.filename:
@@ -61,12 +58,12 @@ else:
 		else:
 			print("Running the function DeleteFileInContainer with the parameters below :")
 			print(" - container : "+ args.container)
-			print(" - client : "+ args.client)
+			print(" - client : "+ config['client'])
 			print(" - filename : "+ args.filename)
 			print(" - namespace : "+ config['AccountClientNamespace'])
 			print(" - endpoint : "+ config['endpoint'])
 			input("Press Enter to continue...")
-			fonctions.deleteFileInContainer(args.client, args.container, args.filename)
+			fonctions.deleteFileInContainer(config['client'], args.container, args.filename)
 
 	elif(args.method == "copy"):
 		if not args.path:
@@ -74,12 +71,12 @@ else:
 		else:
 			print("Running the function UploadFolder with the parameters below :")
 			print(" - container : "+ args.container)
-			print(" - client : "+ args.client)
+			print(" - client : "+ config['client'])
 			print(" - path : "+ args.path)
 			print(" - namespace : "+ config['AccountClientNamespace'])
 			print(" - endpoint : "+ config['endpoint'])
 			input("Press Enter to continue...")
-			fonctions.uploadFolder(args.client, args.container, args.path)
+			fonctions.uploadFolder(config['client'], args.container, args.path)
 
 	elif(args.method == "list"):
 		if not args.period:
@@ -87,21 +84,21 @@ else:
 		else:
 			print("Running the function ListDataForAGivenPeriod with the parameters below :")
 			print(" - container : "+ args.container)
-			print(" - client : "+ args.client)
+			print(" - client : "+ config['client'])
 			print(" - period : "+ str(args.period))
 			print(" - namespace : "+ config['AccountClientNamespace'])
 			print(" - endpoint : "+ config['endpoint'])
 			input("Press Enter to continue...")
-			fonctions.listDataForAGivenPeriod(args.client, args.container, args.period)
+			fonctions.listDataForAGivenPeriod(config['client'], args.container, args.period)
 
 	elif(args.method == "retrieve"):
 		print("Running the function RetrieveAllDataFromContainer with the parameters below :")
 		print(" - container : "+ args.container)
-		print(" - client : "+ args.client)
+		print(" - client : "+ config['client'])
 		print(" - namespace : "+ config['AccountClientNamespace'])
 		print(" - endpoint : "+ config['endpoint'])
 		input("Press Enter to continue...")
-		fonctions.retrieveAllDataFromContainer(args.client, args.container)
+		fonctions.retrieveAllDataFromContainer(config['client'], args.container)
 
 	elif(args.method.length == 0):
 		print("An argument method must be thrown.")
