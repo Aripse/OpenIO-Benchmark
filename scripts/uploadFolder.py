@@ -17,13 +17,13 @@ def uploadFolder(client, container, folder_path):
         s = ObjectStorageApi(config["AccountClientNamespace"])
     for file_name_ext in os.listdir(folder_path):
         file_path_ext=str(folder_path)+'/'+file_name_ext
-        file_name, file_extension = os.path.splitext(file_name_ext)
+        # file_name, file_extension = os.path.splitext(file_name_ext)
         with open(file_path_ext, 'rb') as f:
             data = f.read()
             s.object_create(client, container, obj_name=file_name_ext, data=data)
-            meta, stream = s.object_fetch(client, container, file_name_ext)
-        with open('./'+file_name+file_extension, 'w+b') as e:
-            e.write(b"".join(stream))
+        #     meta, stream = s.object_fetch(client, container, file_name_ext)
+        # with open('./'+file_name+file_extension, 'w+b') as e:
+        #     e.write(b"".join(stream))
 
 
 ac = AccountClient({"namespace": config["AccountClientNamespace"]})

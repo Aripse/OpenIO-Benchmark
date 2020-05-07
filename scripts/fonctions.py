@@ -1,5 +1,6 @@
 import os
 from datetime import date, timedelta, datetime
+import elasticWithAgrs
 
 try:
     import eventlet
@@ -28,6 +29,13 @@ except ImportError:
         input("Cannot load module ObjectStorageApi from oio. Press enter to install the package oio or Ctrl+c to quit the program")
         os.system("pip3 install --user git+https://github.com/open-io/oio-sds.git@6.1.0.0a0")
         from oio import ObjectStorageApi
+
+try:
+    from elasticsearch import Elasticsearch, helpers
+except ImportError:
+    input("Cannot load module Elasticsearch. Press enter to install the package Elasticsearch or Ctrl+c to quit the program")
+    os.system("pip3 install --user Elasticsearch")
+    from elasticsearch import Elasticsearch, helpers
 
 from oio.account.client import AccountClient
 
@@ -101,4 +109,17 @@ def retrieveAllDataFromContainer(client, container):
         with open(element['name'], 'w+b') as e:
             e.write(b"".join(stream))
 
+def elasticUploadFolder(container, index):
+    if os.name == 'posix':
+        slash = "/" # for Linux and macOS
+    else:
+        slash = chr(92) # '\' for Windows
+    host = str(config['elasticsearchDomain']) + ":" + str(config['elasticsearchPort'])
+    client = Elasticsearch(host)
+    elasticWithAgrs.test_connection(config['elasticsearchDomain'], config['elasticsearchPort'], client)
+    elasticWithAgrs.extract_save_file(client, container, index)
+
 ac = AccountClient({"namespace": config["AccountClientNamespace"]})
+
+
+

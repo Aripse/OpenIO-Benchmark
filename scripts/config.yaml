@@ -3,3 +3,5 @@
 AccountClientNamespace: "OPENIO"
 endpoint: ""
 client: "admin"
+elasticsearchDomain: "169.254.205.133"
+elasticsearchPort: 9200

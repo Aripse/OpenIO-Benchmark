@@ -2,6 +2,7 @@
 import yaml
 import fonctions
 import os
+import elasticWithAgrs
 
 os.system("")
 
@@ -30,6 +31,8 @@ parser.add_argument('--period', type=int, nargs='?',
 
 parser.add_argument('--filename', type=str, nargs='?',
             help='The name od the file you want to delete from the container')
+
+parser.add_argument("--index", type=str, nargs='?', help="give specific index")
 
 args=parser.parse_args()
 
@@ -99,6 +102,17 @@ else:
 		print(" - endpoint : "+ config['endpoint'])
 		input("Press Enter to continue...")
 		fonctions.retrieveAllDataFromContainer(config['client'], args.container)
+
+	elif(args.method == "elastic"):
+		print("Running the function RetrieveAllDataFromContainer with the parameters below :")
+		print(" - container : "+ args.container)
+		print(" - client : "+ config['client'])
+		print(" - namespace : "+ config['AccountClientNamespace'])
+		print(" - endpoint : "+ config['endpoint'])
+		print(" - elasticsearchDomain :" + config["elasticsearchDomain"])
+		print(" - elasticsearchPort :" + config["elasticsearchPort"])
+		input("Press Enter to continue...")
+		fonctions.elasticUploadFolder(args.container, args.index)
 
 	elif(args.method.length == 0):
 		print("An argument method must be thrown.")

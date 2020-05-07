@@ -38,6 +38,12 @@ except ImportError:
         input("Cannot load module Elasticsearch. Press enter to install the package Elasticsearch or Ctrl+c to quit the program")
         os.system("pip3 install --user Elasticsearch")
         from elasticsearch import Elasticsearch, helpers
+try:
+    import yaml
+except ImportError:
+    input("Cannot load module yaml. Press enter to install the package yaml or Ctrl+c to quit the program")
+    os.system("pip3 install --user pyyaml")
+    import yaml
 
 #script permettant de mettre l'ensemble des fichiers d'un dossier sur le cluster
 from urllib.parse import unquote
@@ -45,6 +51,9 @@ from oio import ObjectStorageApi
 from oio.account.client import AccountClient
 import os
 import argparse
+
+with open("./config.yaml", "r") as ymlfile:
+    config = yaml.load(ymlfile,  Loader=yaml.FullLoader)
 
 def uploadFolder(container, folder_path):
     s = ObjectStorageApi("OPENIO", endpoint="http://169.254.205.203:6006")
@@ -127,57 +136,61 @@ def yield_docs(all_files):
         }
 
 #retrieve documents
-def extract_save_file(save_path, client):
-    parser.add_argument("index", type=str, help="give specific index")
-    args = parser.parse_args()
-    response = client.search(index=args.index, body={}, size=100)
+def extract_save_file(client, container, index):
+    response = client.search(index=index, body={}, size=100)
     # total num of Elasticsearch documents to get with API call
     elastic_docs = response["hits"]["hits"]
+    if config['endpoint'] != "":
+        s = ObjectStorageApi(config["AccountClientNamespace"], endpoint=config['endpoint'])
+    else:
+        s = ObjectStorageApi(config["AccountClientNamespace"])
     for num, doc in enumerate(elastic_docs):
         # get _source data dict from document
         source_data = doc["_source"]
-        complete_name = os.path.join(save_path, source_data["file_name"])
-        file = open(complete_name, "w+")
-        try:
-            file.write(source_data["data"])
-        finally:
-            file.close()
+        s.object_create(config['AccountClientNamespace'], container, obj_name=source_data["file_name"], data=source_data["data"])
 
-if __name__ == "__main__":
-    #Initialize variables
-    DOMAIN="169.254.205.133"
-    PORT=9200
-    start_time = time.time()
-     # posix uses "/", and Windows uses ""
-    if os.name == 'posix':
-         slash = "/" # for Linux and macOS
-    else:
-        slash = chr(92) # '\' for Windows
-    host = str(DOMAIN) + ":" + str(PORT)
-    client = Elasticsearch(host)
-    test_connection(DOMAIN, PORT, client)
-   # all_files = get_files_in_dir("/Users/macbookpro/Desktop/ClusterOpenIO/test")
-   # try:
-   #     # make the bulk call using 'actions' and get a response
-   #     resp = helpers.bulk(
-   #         client,
-   #         yield_docs( all_files )
-   #     )
-   #     print ("\nhelpers.bulk() RESPONSE:", resp)
-   #     print ("RESPONSE TYPE:", type(resp))
-   # except Exception as err:
-   #     print("\nhelpers.bulk() ERROR:", err)
-    extract_save_file("/home/morgane/Bureau/cluster", client)
-   # total number of files to index
-   # print ("TOTAL FILES:", len( all_files ))
-    parser = argparse.ArgumentParser(
-    description='Upload all files of a folder in the container you desire and for a specific account for a client.')
-    parser.add_argument('container', type=str, nargs='?',
-                    help='The container you want to put the file in')
-    parser.add_argument('path', type=str, nargs='?',
-                    help='The path of the file you want to put inside the cluster')
-    args = parser.parse_args()
-    uploadFolder(args.container, args.path)
-    print ("\n\ntime elapsed:", time.time()-start_time)
+        # complete_name = os.path.join(save_path, source_data["file_name"])
+        # file = open(complete_name, "w+")
+        # try:
+        #     file.write(source_data["data"])
+        # finally:
+        #     file.close()
+
+# if __name__ == "__main__":
+#     #Initialize variables
+#     DOMAIN="169.254.205.133"
+#     PORT=9200
+#     start_time = time.time()
+#      # posix uses "/", and Windows uses ""
+#     if os.name == 'posix':
+#          slash = "/" # for Linux and macOS
+#     else:
+#         slash = chr(92) # '\' for Windows
+#     host = str(DOMAIN) + ":" + str(PORT)
+#     client = Elasticsearch(host)
+#     test_connection(DOMAIN, PORT, client)
+#    # all_files = get_files_in_dir("/Users/macbookpro/Desktop/ClusterOpenIO/test")
+#    # try:
+#    #     # make the bulk call using 'actions' and get a response
+#    #     resp = helpers.bulk(
+#    #         client,
+#    #         yield_docs( all_files )
+#    #     )
+#    #     print ("\nhelpers.bulk() RESPONSE:", resp)
+#    #     print ("RESPONSE TYPE:", type(resp))
+#    # except Exception as err:
+#    #     print("\nhelpers.bulk() ERROR:", err)
+#     extract_save_file("/home/morgane/Bureau/cluster", client)
+#    # total number of files to index
+#    # print ("TOTAL FILES:", len( all_files ))
+#     parser = argparse.ArgumentParser(
+#     description='Upload all files of a folder in the container you desire and for a specific account for a client.')
+#     parser.add_argument('container', type=str, nargs='?',
+#                     help='The container you want to put the file in')
+#     parser.add_argument('path', type=str, nargs='?',
+#                     help='The path of the file you want to put inside the cluster')
+#     args = parser.parse_args()
+#     uploadFolder(args.container, args.path)
+#     print ("\n\ntime elapsed:", time.time()-start_time)
 
 
