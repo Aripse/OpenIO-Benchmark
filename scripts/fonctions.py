@@ -119,7 +119,5 @@ def elasticUploadFolder(container, index):
     elasticWithAgrs.test_connection(config['elasticsearchDomain'], config['elasticsearchPort'], client)
     elasticWithAgrs.extract_save_file(client, container, index)
 
-ac = AccountClient({"namespace": config["AccountClientNamespace"]})
-
 
 

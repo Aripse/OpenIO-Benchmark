@@ -12,6 +12,13 @@ except ImportError:
         input("Cannot load module argparse. Press enter to install the package argparse or Ctrl+c to quit the program")
         os.system("pip3 install --user argparse")
         import argparse
+try:
+    from oio import ObjectStorageApi
+except ImportError:
+        input("Cannot load module ObjectStorageApi from oio. Press enter to install the package oio or Ctrl+c to quit the program")
+        os.system("pip3 install --user git+https://github.com/open-io/oio-sds.git@6.1.0.0a0")
+        from oio import ObjectStorageApi
+from oio.account.client import AccountClient
 
 with open("./config.yaml", "r") as ymlfile:
     config = yaml.load(ymlfile,  Loader=yaml.FullLoader)
@@ -41,6 +48,9 @@ if not args.container:
 elif not config['AccountClientNamespace']:
 	print("The AccountClientNamespace attribute does not exist in the configuration file. Please add it.")
 else:
+	ac = AccountClient({"namespace": config["AccountClientNamespace"]})
+	s = ObjectStorageApi(config["AccountClientNamespace"])
+	s.container_create(ac, args.container)
 	if(args.method == "add"):
 		if not args.path:
 			print("The function AddFileInContainer needs a path argument to work. Please try again.")

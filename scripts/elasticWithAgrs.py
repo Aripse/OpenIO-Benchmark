@@ -18,7 +18,7 @@ try:
     import requests
 except ImportError:
         input("Cannot load module requests. Press enter to install the package requests or Ctrl+c to quit the program")
-        os.system("pip install --user requests")
+        os.system("pip3 install --user requests")
         import requests
 try:
     import glob
@@ -147,50 +147,6 @@ def extract_save_file(client, container, index):
     for num, doc in enumerate(elastic_docs):
         # get _source data dict from document
         source_data = doc["_source"]
-        s.object_create(config['AccountClientNamespace'], container, obj_name=source_data["file_name"], data=source_data["data"])
-
-        # complete_name = os.path.join(save_path, source_data["file_name"])
-        # file = open(complete_name, "w+")
-        # try:
-        #     file.write(source_data["data"])
-        # finally:
-        #     file.close()
-
-# if __name__ == "__main__":
-#     #Initialize variables
-#     DOMAIN="169.254.205.133"
-#     PORT=9200
-#     start_time = time.time()
-#      # posix uses "/", and Windows uses ""
-#     if os.name == 'posix':
-#          slash = "/" # for Linux and macOS
-#     else:
-#         slash = chr(92) # '\' for Windows
-#     host = str(DOMAIN) + ":" + str(PORT)
-#     client = Elasticsearch(host)
-#     test_connection(DOMAIN, PORT, client)
-#    # all_files = get_files_in_dir("/Users/macbookpro/Desktop/ClusterOpenIO/test")
-#    # try:
-#    #     # make the bulk call using 'actions' and get a response
-#    #     resp = helpers.bulk(
-#    #         client,
-#    #         yield_docs( all_files )
-#    #     )
-#    #     print ("\nhelpers.bulk() RESPONSE:", resp)
-#    #     print ("RESPONSE TYPE:", type(resp))
-#    # except Exception as err:
-#    #     print("\nhelpers.bulk() ERROR:", err)
-#     extract_save_file("/home/morgane/Bureau/cluster", client)
-#    # total number of files to index
-#    # print ("TOTAL FILES:", len( all_files ))
-#     parser = argparse.ArgumentParser(
-#     description='Upload all files of a folder in the container you desire and for a specific account for a client.')
-#     parser.add_argument('container', type=str, nargs='?',
-#                     help='The container you want to put the file in')
-#     parser.add_argument('path', type=str, nargs='?',
-#                     help='The path of the file you want to put inside the cluster')
-#     args = parser.parse_args()
-#     uploadFolder(args.container, args.path)
-#     print ("\n\ntime elapsed:", time.time()-start_time)
+        s.object_create(config['client'], container, obj_name=source_data["file_name"], data=source_data["data"])
 
 

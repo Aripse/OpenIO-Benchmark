@@ -7,7 +7,7 @@ from oio.account.client import AccountClient
 ac = AccountClient({"namespace": "OPENIO"})
 
 # Account creation: Returns true if everything went well.
-ac.account_create("my_ac2") 
+ac.account_create("admin") 
 
 #create a container
 s.container_create(ac, "node1")
