@@ -55,7 +55,6 @@ else:
 		if not args.path:
 			print("The function AddFileInContainer needs a path argument to work. Please try again.")
 		else:
-			print(" ", end="")
 			print("Running the function AddFileInContainer with the parameters below :")
 			print(" - container : "+ args.container)
 			print(" - client : "+ config['client'])
@@ -124,6 +123,15 @@ else:
 		input("Press Enter to continue...")
 		fonctions.elasticUploadFolder(args.container, args.index)
 
+	elif(args.method=="create_container"):
+		print("Running the function RetrieveAllDataFromContainer with the parameters below :")
+		print(" - container : "+ args.container)
+		print(" - client : "+ config['client'])
+		print(" - namespace : "+ config['AccountClientNamespace'])
+		print(" - endpoint : "+ config['endpoint'])
+		input("Press Enter to continue...")
+		fonctions.addContainer(args.container)
+
 	elif(args.method.length == 0):
 		print("An argument method must be thrown.")
 
@@ -134,3 +142,5 @@ else:
 		print("- copy : to copy an entire folder inside a container")
 		print("- list : to list every items inside a container for a given period")
 		print("- retrieve : to get every file from a container outside the container")
+		print("- elastic : to put every file from an elastic index inside the container")
+		print("- create_container : to create an empty container")

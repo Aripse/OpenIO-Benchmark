@@ -119,5 +119,10 @@ def elasticUploadFolder(container, index):
     elasticWithAgrs.test_connection(config['elasticsearchDomain'], config['elasticsearchPort'], client)
     elasticWithAgrs.extract_save_file(client, container, index)
 
-
+def addContainer(container):
+    if config['endpoint'] != "":
+        s = ObjectStorageApi(config["AccountClientNamespace"], endpoint=config['endpoint'])
+    else:
+        s = ObjectStorageApi(config["AccountClientNamespace"])
+    s.container_create(config["client"],container)
 
