@@ -1,7 +1,7 @@
+#Configuration file
 
-
-AccountClientNamespace: "OPENIO"
-endpoint: ""
-client: "admin"
-elasticsearchDomain: "192.168.1.104"
-elasticsearchPort: "9200"
+AccountClientNamespace: "OPENIO" #name of the Namespace file
+endpoint: "" #IP address of the node containing the cluster access proxy
+client: "admin" #name of the account owner of the containers
+elasticsearchDomain: "192.168.1.104" #IP address of the domain on which the Elasticsearch server is launched
+elasticsearchPort: "9200" #Elasticsearch database access port
