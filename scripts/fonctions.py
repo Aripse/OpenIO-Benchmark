@@ -1,7 +1,11 @@
+#script containing the different functions with OpenIO
+
+#import of natives modules and script containing ElasticSearch
 import os
 from datetime import date, timedelta, datetime
 import elasticWithAgrs
 
+#import of OpenIO, ElasticSearch and other modules with import test
 try:
     import eventlet
 except ImportError:
@@ -39,10 +43,11 @@ except ImportError:
 
 from oio.account.client import AccountClient
 
-
+#read variables from configuration file
 with open("./config.yaml", "r") as ymlfile:
     config = yaml.load(ymlfile,  Loader=yaml.FullLoader)
 
+#fonction to add a file in the container
 def addFileInContainer(container, path, client):
     if config['endpoint'] != "":
         s = ObjectStorageApi(config["AccountClientNamespace"], endpoint=config['endpoint'])
@@ -55,6 +60,7 @@ def addFileInContainer(container, path, client):
         s.object_create(client, container, obj_name=fileName, data=f)
         meta, stream = s.object_fetch(client, container, fileName)
 
+#fonction to delete a file in the container
 def deleteFileInContainer(client, container, fileName):
     if config['endpoint'] != "":
         s = ObjectStorageApi(config["AccountClientNamespace"], endpoint=config['endpoint'])
@@ -62,6 +68,7 @@ def deleteFileInContainer(client, container, fileName):
         s = ObjectStorageApi(config["AccountClientNamespace"])
     s.object_delete(client, container, fileName)
 
+#fonction to copy an entire folder from sever to the OpenIO container
 def uploadFolder(client, container, folder_path):
     if config['endpoint'] != "":
         s = ObjectStorageApi(config["AccountClientNamespace"], endpoint=config['endpoint'])
@@ -77,6 +84,7 @@ def uploadFolder(client, container, folder_path):
         with open('./'+file_name+file_extension, 'w+b') as e:
             e.write(b"".join(stream))
 
+#fonction to list all data inside a container
 def listDataForAGivenPeriod(client, container, period):
     if config['endpoint'] != "":
         s = ObjectStorageApi(config["AccountClientNamespace"], endpoint=config['endpoint'])
@@ -97,6 +105,7 @@ def listDataForAGivenPeriod(client, container, period):
 
     print(objects)
 
+#fonction to retrieve all data from a container
 def retrieveAllDataFromContainer(client, container):
     if config['endpoint'] != "":
         s = ObjectStorageApi(config["AccountClientNamespace"], endpoint=config['endpoint'])
@@ -109,6 +118,7 @@ def retrieveAllDataFromContainer(client, container):
         with open(element['name'], 'w+b') as e:
             e.write(b"".join(stream))
 
+#fonction to copy an entire folder from ElasticSearch to the OpenIO container
 def elasticUploadFolder(container, index):
     if os.name == 'posix':
         slash = "/" # for Linux and macOS
@@ -119,6 +129,7 @@ def elasticUploadFolder(container, index):
     elasticWithAgrs.test_connection(config['elasticsearchDomain'], config['elasticsearchPort'], client)
     elasticWithAgrs.extract_save_file(client, container, index)
 
+#fonction to create a container
 def addContainer(container):
     if config['endpoint'] != "":
         s = ObjectStorageApi(config["AccountClientNamespace"], endpoint=config['endpoint'])
