@@ -8,7 +8,7 @@ import elasticWithAgrs
 
 os.system("")
 
-#import of OpenIO and other modules with import test
+#import of OpenIO and other modules with error management
 try:
     import argparse
 except ImportError:
