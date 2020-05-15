@@ -4,8 +4,7 @@ import sys
 
 
 # a function to 'openio cluster list' command
-def list_openio_cluster_ist():
-    cmd_cluster_list = "openio cluster list"
+def list_openio_cluster_ist(cmd_cluster_list):
 
     # using the Popen function to execute the command and store the result in temp.
     # it returns a tuple that contains the  data and the error if any.
@@ -37,10 +36,9 @@ def list_openio_cluster_ist():
     for elt in range(len(displays)):
         print(','.join(displays[elt]))
 
-def verify_all_processes_are_up_and_running():
-    gridinit_cmd_status = "gridinit_cmd status"
+def verify_all_processes_are_up_and_running(gridinit_cmd_status):
 
-    # using the Popen function to execute the command and store the result in temp.
+    # using the Popen function to execute the command and store the result in status_output.
     # it returns a tuple that contains the  data and the error if any.
     status_output = subprocess.Popen(gridinit_cmd_status.split(), stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE, encoding="utf8")
@@ -68,6 +66,22 @@ def verify_all_processes_are_up_and_running():
         print(','.join(displays_status[elt]))
 
 
-list_openio_cluster_ist()
+def command_ruok_nc(ruok_nc):
+
+    # using the Popen function to execute the command and store the result in ruok_nc_output.
+    # it returns a tuple that contains the  data and the error if any.
+    ruok_nc_output = subprocess.Popen(ruok_nc.split(), stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE, encoding="utf8")
+    # we use the communicate function to fetch the output
+    ruok_nc_output_data, ruok_nc_output_error_= ruok_nc_output.communicate(input=None, timeout=None)
+
+    if ruok_nc_output_data == 'imok':
+        print("TRUE")
+    else:
+        print("False")
+
+list_openio_cluster_ist("openio cluster list")
 print()
-verify_all_processes_are_up_and_running()
+verify_all_processes_are_up_and_running("gridinit_cmd status")
+print()
+command_ruok_nc("echo ruok | nc 10.0.2.15 6005")
