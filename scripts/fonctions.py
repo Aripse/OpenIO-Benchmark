@@ -1,6 +1,11 @@
+#!/usr/bin/python3
+
 import os
-from datetime import date, timedelta, datetime
-import elasticWithAgrs
+from datetime import timedelta, datetime
+import pytz
+
+
+#import elasticWithAgrs
 
 try:
     import eventlet
@@ -9,12 +14,12 @@ except ImportError:
     os.system("pip3 install --user eventlet")
     import eventlet
 
-try:
-    import urllib3
-except ImportError:
-        input("Cannot load module urllib3. Press enter to install the package urllib3 or Ctrl+c to quit the program")
-        os.system(" pip3 install --user urllib3")
-        import urllib3
+#try:
+#    import urllib3
+#except ImportError:
+#        input("Cannot load module urllib3. Press enter to install the package urllib3 or Ctrl+c to quit the program")
+#        os.system(" pip3 install --user urllib3")
+#        import urllib3
 
 try:
     import yaml
@@ -37,77 +42,51 @@ except ImportError:
     os.system("pip3 install --user Elasticsearch")
     from elasticsearch import Elasticsearch, helpers
 
-from oio.account.client import AccountClient
+try:
+    import boto3
+except ImportError:
+    input("Cannot load module ObjectStorageApi from oio. Press enter to install the package oio or Ctrl+c to quit the program")
+    os.system("pip3 install --user boto3")
+    import boto3
+
 
 
 with open("./config.yaml", "r") as ymlfile:
     config = yaml.load(ymlfile,  Loader=yaml.FullLoader)
 
-def addFileInContainer(container, path, client):
-    if config['endpoint'] != "":
-        s = ObjectStorageApi(config["AccountClientNamespace"], endpoint=config['endpoint'])
-    else:
-        s = ObjectStorageApi(config["AccountClientNamespace"])
+session = boto3.Session()
+s3_client = session.client(service_name='s3', aws_access_key_id=config['awsAccessKeyId'], aws_secret_access_key =config['awsSecretKey'] , endpoint_url=config["awsEndpointUrl"])
+
+def addFileInContainer(container, path):
     fileName = os.path.basename(path)
 
     #try/except
-    with open(path, 'rb') as f:
-        s.object_create(client, container, obj_name=fileName, data=f)
-        meta, stream = s.object_fetch(client, container, fileName)
+    s3_client.upload_file(Filename= path, Bucket=container, Key= fileName)
 
-def deleteFileInContainer(client, container, fileName):
-    if config['endpoint'] != "":
-        s = ObjectStorageApi(config["AccountClientNamespace"], endpoint=config['endpoint'])
-    else:
-        s = ObjectStorageApi(config["AccountClientNamespace"])
-    s.object_delete(client, container, fileName)
+def deleteFileInContainer(container, fileName):
+    s3_client.delete_object(Bucket=container, Key= fileName)
 
-def uploadFolder(client, container, folder_path):
-    if config['endpoint'] != "":
-        s = ObjectStorageApi(config["AccountClientNamespace"], endpoint=config['endpoint'])
-    else:
-        s = ObjectStorageApi(config["AccountClientNamespace"])
+def uploadFolder( container, folder_path):
     for file_name_ext in os.listdir(folder_path):
         file_path_ext=str(folder_path)+'/'+file_name_ext
-        file_name, file_extension = os.path.splitext(file_name_ext)
-        with open(file_path_ext, 'rb') as f:
-            data = f.read()
-            s.object_create(client, container, obj_name=file_name_ext, data=data)
-            meta, stream = s.object_fetch(client, container, file_name_ext)
-        with open('./'+file_name+file_extension, 'w+b') as e:
-            e.write(b"".join(stream))
+        s3_client.upload_file(Filename= file_path_ext, Bucket= container, Key=file_name_ext)
 
-def listDataForAGivenPeriod(client, container, period):
-    if config['endpoint'] != "":
-        s = ObjectStorageApi(config["AccountClientNamespace"], endpoint=config['endpoint'])
-    else:
-        s = ObjectStorageApi(config["AccountClientNamespace"])
+def listDataForAGivenPeriod( container, period):
     objects = []
     t = timedelta(days=period)
-
-    today = datetime.today()
-
-    for element in s.object_list(client, container)['objects']:
-        meta, stream = s.object_fetch(client, container, element['name'])
-        creationDate = datetime.fromtimestamp(
-            int(meta['ctime']))
+    utc=pytz.UTC
+    today = utc.localize(datetime.today())
+    for element in s3_client.list_objects(Bucket=container)['Contents']:
+        creationDate = element['LastModified'].replace(tzinfo=utc)
         duration = today - t
         if(creationDate >= duration):
-            objects.append(meta)
+            objects.append(element)
 
     print(objects)
 
-def retrieveAllDataFromContainer(client, container):
-    if config['endpoint'] != "":
-        s = ObjectStorageApi(config["AccountClientNamespace"], endpoint=config['endpoint'])
-    else:
-        s = ObjectStorageApi(config["AccountClientNamespace"])
-    # print(s.object_list(client, container)['objects'])
-    for element in s.object_list(client, container)['objects']:
-        meta, stream = s.object_fetch(client, container, element['name'])
-
-        with open(element['name'], 'w+b') as e:
-            e.write(b"".join(stream))
+def retrieveAllDataFromContainer(container):
+    for element in s3_client.list_objects(Bucket=container)['Contents']:
+        s3_client.download_file(Bucket=container, Key=element['Key'], Filename= element['Key'])
 
 def elasticUploadFolder(container, index):
     if os.name == 'posix':
@@ -116,13 +95,14 @@ def elasticUploadFolder(container, index):
         slash = chr(92) # '\' for Windows
     host = str(config['elasticsearchDomain']) + ":" + str(config['elasticsearchPort'])
     client = Elasticsearch(host)
-    elasticWithAgrs.test_connection(config['elasticsearchDomain'], config['elasticsearchPort'], client)
-    elasticWithAgrs.extract_save_file(client, container, index)
+    # elasticWithAgrs.test_connection(config['elasticsearchDomain'], config['elasticsearchPort'], client)
+    response = client.search(index=index, body={}, size=100)
+    elastic_docs = response["hits"]["hits"]
+    for num, doc in enumerate(elastic_docs):
+        # get _source data dict from document
+        source_data = doc["_source"]
+        s3_client.upload_file(Filename= source_data["file_name"],Bucket=container, Key= source_data["file_name"])
 
 def addContainer(container):
-    if config['endpoint'] != "":
-        s = ObjectStorageApi(config["AccountClientNamespace"], endpoint=config['endpoint'])
-    else:
-        s = ObjectStorageApi(config["AccountClientNamespace"])
-    s.container_create(config["client"],container)
+    s3_client.create_bucket(Bucket=container)
 

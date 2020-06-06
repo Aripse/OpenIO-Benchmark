@@ -20,6 +20,8 @@ except ImportError:
         from oio import ObjectStorageApi
 from oio.account.client import AccountClient
 
+
+
 with open("./config.yaml", "r") as ymlfile:
     config = yaml.load(ymlfile,  Loader=yaml.FullLoader)
 
@@ -48,21 +50,16 @@ if not args.container:
 elif not config['AccountClientNamespace']:
 	print("The AccountClientNamespace attribute does not exist in the configuration file. Please add it.")
 else:
-	ac = AccountClient({"namespace": config["AccountClientNamespace"]})
-	s = ObjectStorageApi(config["AccountClientNamespace"])
-	s.container_create(ac, args.container)
 	if(args.method == "add"):
 		if not args.path:
 			print("The function AddFileInContainer needs a path argument to work. Please try again.")
 		else:
 			print("Running the function AddFileInContainer with the parameters below :")
 			print(" - container : "+ args.container)
-			print(" - client : "+ config['client'])
 			print(" - path : "+ args.path)
 			print(" - namespace : "+ config['AccountClientNamespace'])
-			print(" - endpoint : "+ config['endpoint'])
 			input("Press Enter to continue...")
-			fonctions.addFileInContainer(args.container, args.path, config['client'])
+			fonctions.addFileInContainer(args.container, args.path)
 
 	elif(args.method == "delete"):
 		if not args.filename:
@@ -73,9 +70,9 @@ else:
 			print(" - client : "+ config['client'])
 			print(" - filename : "+ args.filename)
 			print(" - namespace : "+ config['AccountClientNamespace'])
-			print(" - endpoint : "+ config['endpoint'])
+			print(" - endpoint : "+ config['awsEndpointUrl'])
 			input("Press Enter to continue...")
-			fonctions.deleteFileInContainer(config['client'], args.container, args.filename)
+			fonctions.deleteFileInContainer(args.container, args.filename)
 
 	elif(args.method == "copy"):
 		if not args.path:
@@ -86,9 +83,9 @@ else:
 			print(" - client : "+ config['client'])
 			print(" - path : "+ args.path)
 			print(" - namespace : "+ config['AccountClientNamespace'])
-			print(" - endpoint : "+ config['endpoint'])
+			print(" - endpoint : "+ config['awsEndpointUrl'])
 			input("Press Enter to continue...")
-			fonctions.uploadFolder(config['client'], args.container, args.path)
+			fonctions.uploadFolder( args.container, args.path)
 
 	elif(args.method == "list"):
 		if not args.period:
@@ -99,25 +96,25 @@ else:
 			print(" - client : "+ config['client'])
 			print(" - period : "+ str(args.period))
 			print(" - namespace : "+ config['AccountClientNamespace'])
-			print(" - endpoint : "+ config['endpoint'])
+			print(" - endpoint : "+ config['awsEndpointUrl'])
 			input("Press Enter to continue...")
-			fonctions.listDataForAGivenPeriod(config['client'], args.container, args.period)
+			fonctions.listDataForAGivenPeriod( args.container, args.period)
 
 	elif(args.method == "retrieve"):
 		print("Running the function RetrieveAllDataFromContainer with the parameters below :")
 		print(" - container : "+ args.container)
 		print(" - client : "+ config['client'])
 		print(" - namespace : "+ config['AccountClientNamespace'])
-		print(" - endpoint : "+ config['endpoint'])
+		print(" - endpoint : "+ config['awsEndpointUrl'])
 		input("Press Enter to continue...")
-		fonctions.retrieveAllDataFromContainer(config['client'], args.container)
+		fonctions.retrieveAllDataFromContainer( args.container)
 
 	elif(args.method == "elastic"):
 		print("Running the function RetrieveAllDataFromContainer with the parameters below :")
 		print(" - container : "+ args.container)
 		print(" - client : "+ config['client'])
 		print(" - namespace : "+ config['AccountClientNamespace'])
-		print(" - endpoint : "+ config['endpoint'])
+		print(" - endpoint : "+ config['awsEndpointUrl'])
 		print(" - elasticsearchDomain :" + config["elasticsearchDomain"])
 		print(" - elasticsearchPort :" + config["elasticsearchPort"])
 		input("Press Enter to continue...")
@@ -128,7 +125,7 @@ else:
 		print(" - container : "+ args.container)
 		print(" - client : "+ config['client'])
 		print(" - namespace : "+ config['AccountClientNamespace'])
-		print(" - endpoint : "+ config['endpoint'])
+		print(" - endpoint : "+ config['awsEndpointUrl'])
 		input("Press Enter to continue...")
 		fonctions.addContainer(args.container)
 

@@ -140,13 +140,9 @@ def extract_save_file(client, container, index):
     response = client.search(index=index, body={}, size=100)
     # total num of Elasticsearch documents to get with API call
     elastic_docs = response["hits"]["hits"]
-    if config['endpoint'] != "":
-        s = ObjectStorageApi(config["AccountClientNamespace"], endpoint=config['endpoint'])
-    else:
-        s = ObjectStorageApi(config["AccountClientNamespace"])
     for num, doc in enumerate(elastic_docs):
         # get _source data dict from document
         source_data = doc["_source"]
-        s.object_create(config['client'], container, obj_name=source_data["file_name"], data=source_data["data"])
+        # s.object_create(config['client'], container, obj_name=source_data["file_name"], data=source_data["data"])
 
 

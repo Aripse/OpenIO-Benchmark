@@ -1,0 +1,6 @@
+import boto3
+
+session = boto3.Session()
+
+s3_client = session.client(service_name='s3', aws_access_key_id='demo:demo', aws_secret_access_key = 'DEMO_PASS', endpoint_url='http://172.23.0.2:6007')
+exit(1)

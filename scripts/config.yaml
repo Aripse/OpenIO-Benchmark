@@ -5,3 +5,8 @@ endpoint: ""
 client: "admin"
 elasticsearchDomain: "192.168.1.104"
 elasticsearchPort: "9200"
+awsEndpointUrl: "http://172.23.0.2:6007"
+awsSecretKey: 'DEMO_PASS'
+awsAccessKeyId: 'demo:demo'
+awsServiceName: 's3'
+
