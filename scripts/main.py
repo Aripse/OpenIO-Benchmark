@@ -1,11 +1,14 @@
+#main script: launch the different functions with OpenIO
 
+#import of natives modules and script containing functions
 import yaml
-import fonctions
+import fonctions 
 import os
 import elasticWithAgrs
 
 os.system("")
 
+#import of OpenIO and other modules with error management
 try:
     import argparse
 except ImportError:
@@ -20,31 +23,36 @@ except ImportError:
         from oio import ObjectStorageApi
 from oio.account.client import AccountClient
 
-
-
+#read variables from configuration file
 with open("./config.yaml", "r") as ymlfile:
     config = yaml.load(ymlfile,  Loader=yaml.FullLoader)
 
+#configuring command line arguments
 parser = argparse.ArgumentParser(description='call the function you want : add to add a file in the container, delete to delete a file in the container, copy to copy an entire folder in the container, list to list all data inside a container, retrieve to retrieve all data from a container')
 
+#name of the function to call (add, delete, copy, list, retrieve, elastic, create_container) 
 parser.add_argument('method',type=str, nargs='?')
 
+#name of the container
 parser.add_argument('--container', type=str, nargs='?',
                     help='The container you want to put the file in')
-
+#path of the file
 parser.add_argument('--path', type=str, nargs='?',
                     help='The path of the file you want to put inside the cluster')
 
+#time period (in days since today)
 parser.add_argument('--period', type=int, nargs='?', 
 			help='The period of the retrieved data')
-
+#name of the fle
 parser.add_argument('--filename', type=str, nargs='?',
             help='The name od the file you want to delete from the container')
 
+#name of the subscriber index from ElasticSearch 
 parser.add_argument("--index", type=str, nargs='?', help="give specific index")
 
 args=parser.parse_args()
 
+#verification of the presence of the argument "container" and the configuration variable "AccountClientNamespace" then launching of the function according to the argument "method"
 if not args.container:
 	print("You must have a container parameter for the function to work smoothly.")
 elif not config['AccountClientNamespace']:
@@ -61,7 +69,7 @@ else:
 			input("Press Enter to continue...")
 			fonctions.addFileInContainer(args.container, args.path)
 
-	elif(args.method == "delete"):
+	elif(args.method == "delete"): #delete a file in the container
 		if not args.filename:
 			print("The function DeleteFileInContainer needs a filename argument to work. Please try again.")
 		else:
@@ -74,7 +82,7 @@ else:
 			input("Press Enter to continue...")
 			fonctions.deleteFileInContainer(args.container, args.filename)
 
-	elif(args.method == "copy"):
+	elif(args.method == "copy"): #copy an entire folder from sever to the OpenIO container
 		if not args.path:
 			print("The function UploadFolder needs a path argument to work. Please try again.")
 		else:
@@ -87,7 +95,7 @@ else:
 			input("Press Enter to continue...")
 			fonctions.uploadFolder( args.container, args.path)
 
-	elif(args.method == "list"):
+	elif(args.method == "list"): #list all data inside a container
 		if not args.period:
 			print("The function ListDataForAGivenPeriod needs a period argument to work. Please try again.")
 		else:
@@ -100,7 +108,7 @@ else:
 			input("Press Enter to continue...")
 			fonctions.listDataForAGivenPeriod( args.container, args.period)
 
-	elif(args.method == "retrieve"):
+	elif(args.method == "retrieve"): #retrieve all data from a container
 		print("Running the function RetrieveAllDataFromContainer with the parameters below :")
 		print(" - container : "+ args.container)
 		print(" - client : "+ config['client'])
@@ -109,7 +117,7 @@ else:
 		input("Press Enter to continue...")
 		fonctions.retrieveAllDataFromContainer( args.container)
 
-	elif(args.method == "elastic"):
+	elif(args.method == "elastic"): #copy an entire folder from ElasticSearch to the OpenIO container
 		print("Running the function RetrieveAllDataFromContainer with the parameters below :")
 		print(" - container : "+ args.container)
 		print(" - client : "+ config['client'])
@@ -120,7 +128,7 @@ else:
 		input("Press Enter to continue...")
 		fonctions.elasticUploadFolder(args.container, args.index)
 
-	elif(args.method=="create_container"):
+	elif(args.method=="create_container"): #create a container
 		print("Running the function RetrieveAllDataFromContainer with the parameters below :")
 		print(" - container : "+ args.container)
 		print(" - client : "+ config['client'])
@@ -129,10 +137,10 @@ else:
 		input("Press Enter to continue...")
 		fonctions.addContainer(args.container)
 
-	elif(args.method.length == 0):
+	elif(args.method.length == 0): #error handling: no method argument
 		print("An argument method must be thrown.")
 
-	else:
+	else: #display of the "help" menu
 		print("Invalid argument" + args.method+ "for method. Please try with one of the below possibilities :")
 		print("- add : to add a specific file in a container")
 		print("- delete : to delete a specific file inside a container")
