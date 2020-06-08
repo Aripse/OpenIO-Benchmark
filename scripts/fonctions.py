@@ -133,8 +133,18 @@ def elasticUploadFolder(container, index, retention=0):
 	)
 
 #function to create a container
-def addContainer(container):
-    s3_client.create_bucket(Bucket=container)
+def addContainer(container, newACL='private'):
+    s3_client.create_bucket(ACL=newACL, Bucket=container)
+
+
+#function to get the Acess Control List policy of a container
+def getACL(container):
+    bucket_acl = s3_client.get_bucket_acl(Bucket=container)
+    print(bucket_acl)
+
+#function to modify the Acess Control List policy of a container
+def putACL(container,newACL):
+    bucket_acl = s3_client.put_bucket_acl(ACL=newACL, Bucket=container)
 
 #function to get the retention policy of an object
 def getRetention(container, filename):
