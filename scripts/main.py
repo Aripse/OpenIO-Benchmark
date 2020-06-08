@@ -50,6 +50,10 @@ parser.add_argument('--filename', type=str, nargs='?',
 #name of the subscriber index from ElasticSearch 
 parser.add_argument("--index", type=str, nargs='?', help="give specific index")
 
+#The Access Control List you want to put on a container/object.
+parser.add_argument("--ACL", type=str, nargs='?',
+help="The Access Control List you want to put on a container/object. It must be 'private'|'public-read'|'public-read-write'|'authenticated-read' if it's a container.")
+
 #The number of days from today until this Object Lock Retention will expire
 parser.add_argument("--retention", type=int, nargs='?',
 help="The number of days from today until this Object Lock Retention will expire.")
@@ -150,11 +154,35 @@ else:
 	elif(args.method=="create_container"): #create a container
 		print("Running the function addContainer with the parameters below :")
 		print(" - container : "+ args.container)
+		if args.ACL:
+				print(" - ACL :"+ args.ACL)
 		print(" - client : "+ config['client'])
 		print(" - namespace : "+ config['AccountClientNamespace'])
 		print(" - endpoint : "+ config['awsEndpointUrl'])
 		input("Press Enter to continue...")
-		fonctions.addContainer(args.container)
+		if args.ACL:
+			fonctions.addContainer(args.container,args.ACL)
+		else:
+			fonctions.addContainer(args.container)
+
+	elif(args.method=="get_ACL"): #get the Access Control List of a container
+		print("Running the function GetACL with the parameters below :")
+		print(" - container : "+ args.container)
+		print(" - client : "+ config['client'])
+		print(" - namespace : "+ config['AccountClientNamespace'])
+		print(" - endpoint : "+ config['awsEndpointUrl'])
+		input("Press Enter to continue...")
+		fonctions.getACL(args.container)
+
+	elif(args.method=="put_ACL"): #modify the Access Control List of a container
+		print("Running the function PutACL with the parameters below :")
+		print(" - container : "+ args.container)
+		print(" - ACL : "+ args.ACL)
+		print(" - client : "+ config['client'])
+		print(" - namespace : "+ config['AccountClientNamespace'])
+		print(" - endpoint : "+ config['awsEndpointUrl'])
+		input("Press Enter to continue...")
+		fonctions.putACL(args.container,args.ACL)
 
 	elif(args.method=="get_retention"): #get the retention policy of an object
 		print("Running the function GetRetention with the parameters below :")
