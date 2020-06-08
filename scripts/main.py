@@ -50,6 +50,10 @@ parser.add_argument('--filename', type=str, nargs='?',
 #name of the subscriber index from ElasticSearch 
 parser.add_argument("--index", type=str, nargs='?', help="give specific index")
 
+#The number of days from today until this Object Lock Retention will expire
+parser.add_argument("--retention", type=int, nargs='?',
+help="The number of days from today until this Object Lock Retention will expire.")
+
 args=parser.parse_args()
 
 #verification of the presence of the argument "container" and the configuration variable "AccountClientNamespace" then launching of the function according to the argument "method"
@@ -65,9 +69,14 @@ else:
 			print("Running the function AddFileInContainer with the parameters below :")
 			print(" - container : "+ args.container)
 			print(" - path : "+ args.path)
+			if args.retention:
+				print(" - retention :"+ str(args.retention))
 			print(" - namespace : "+ config['AccountClientNamespace'])
 			input("Press Enter to continue...")
-			fonctions.addFileInContainer(args.container, args.path)
+			if args.retention:
+				fonctions.addFileInContainer(args.container, args.path, args.retention)
+			else:
+				fonctions.addFileInContainer(args.container, args.path)
 
 	elif(args.method == "delete"): #delete a file in the container
 		if not args.filename:
@@ -90,10 +99,15 @@ else:
 			print(" - container : "+ args.container)
 			print(" - client : "+ config['client'])
 			print(" - path : "+ args.path)
+			if args.retention:
+				print(" - retention :"+ str(args.retention))
 			print(" - namespace : "+ config['AccountClientNamespace'])
 			print(" - endpoint : "+ config['awsEndpointUrl'])
 			input("Press Enter to continue...")
-			fonctions.uploadFolder( args.container, args.path)
+			if args.retention:
+				fonctions.uploadFolder(args.container, args.path, args.retention)
+			else:
+				fonctions.uploadFolder(args.container, args.path)
 
 	elif(args.method == "list"): #list all data inside a container
 		if not args.period:
@@ -118,24 +132,51 @@ else:
 		fonctions.retrieveAllDataFromContainer( args.container)
 
 	elif(args.method == "elastic"): #copy an entire folder from ElasticSearch to the OpenIO container
-		print("Running the function RetrieveAllDataFromContainer with the parameters below :")
+		print("Running the function elasticUploadFolder with the parameters below :")
 		print(" - container : "+ args.container)
 		print(" - client : "+ config['client'])
+		if args.retention:
+				print(" - retention :"+ str(args.retention))
 		print(" - namespace : "+ config['AccountClientNamespace'])
 		print(" - endpoint : "+ config['awsEndpointUrl'])
 		print(" - elasticsearchDomain :" + config["elasticsearchDomain"])
 		print(" - elasticsearchPort :" + config["elasticsearchPort"])
 		input("Press Enter to continue...")
-		fonctions.elasticUploadFolder(args.container, args.index)
+		if args.retention:
+			fonctions.elasticUploadFolder(args.container, args.index, args.retention)
+		else:
+			fonctions.elasticUploadFolder(args.container, args.index)
 
 	elif(args.method=="create_container"): #create a container
-		print("Running the function RetrieveAllDataFromContainer with the parameters below :")
+		print("Running the function addContainer with the parameters below :")
 		print(" - container : "+ args.container)
 		print(" - client : "+ config['client'])
 		print(" - namespace : "+ config['AccountClientNamespace'])
 		print(" - endpoint : "+ config['awsEndpointUrl'])
 		input("Press Enter to continue...")
 		fonctions.addContainer(args.container)
+
+	elif(args.method=="get_retention"): #get the retention policy of an object
+		print("Running the function GetRetention with the parameters below :")
+		print(" - container : "+ args.container)
+		print(" - client : "+ config['client'])
+		print(" - filename : "+ args.filename)
+		print(" - namespace : "+ config['AccountClientNamespace'])
+		print(" - endpoint : "+ config['awsEndpointUrl'])
+		input("Press Enter to continue...")
+		fonctions.getRetention(args.container,args.filename)
+
+	elif(args.method=="put_retention"): #modify the retention policy of an object
+		print("Running the function GetRetention with the parameters below :")
+		print(" - container : "+ args.container)
+		print(" - client : "+ config['client'])
+		print(" - filename : "+ args.filename)
+		print(" - retention :"+ str(args.retention))
+		print(" - namespace : "+ config['AccountClientNamespace'])
+		print(" - endpoint : "+ config['awsEndpointUrl'])
+		input("Press Enter to continue...")
+		fonctions.putRetention(args.container,args.filename,args.retention)
+
 
 	elif(args.method.length == 0): #error handling: no method argument
 		print("An argument method must be thrown.")
