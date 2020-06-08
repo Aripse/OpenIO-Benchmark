@@ -52,7 +52,7 @@ parser.add_argument("--index", type=str, nargs='?', help="give specific index")
 
 #The Access Control List you want to put on a container/object.
 parser.add_argument("--ACL", type=str, nargs='?',
-help="The Access Control List you want to put on a container/object. It must be 'private'|'public-read'|'public-read-write'|'authenticated-read' if it's a container.")
+help="The Access Control List you want to put on a container/object. It must be 'private'|'public-read'|'public-read-write'|'authenticated-read' for a container. It must be 'private'|'public-read'|'public-read-write'|'authenticated-read'|'aws-exec-read'|'bucket-owner-read'|'bucket-owner-full-control' for an object.")
 
 #The number of days from today until this Object Lock Retention will expire
 parser.add_argument("--retention", type=int, nargs='?',
@@ -165,24 +165,45 @@ else:
 		else:
 			fonctions.addContainer(args.container)
 
-	elif(args.method=="get_ACL"): #get the Access Control List of a container
-		print("Running the function GetACL with the parameters below :")
+	elif(args.method=="get_container_ACL"): #get the Access Control List of a container
+		print("Running the function GetBucketACL with the parameters below :")
 		print(" - container : "+ args.container)
 		print(" - client : "+ config['client'])
 		print(" - namespace : "+ config['AccountClientNamespace'])
 		print(" - endpoint : "+ config['awsEndpointUrl'])
 		input("Press Enter to continue...")
-		fonctions.getACL(args.container)
+		fonctions.getBucketACL(args.container)
 
-	elif(args.method=="put_ACL"): #modify the Access Control List of a container
-		print("Running the function PutACL with the parameters below :")
+	elif(args.method=="put_container_ACL"): #modify the Access Control List of a container
+		print("Running the function PutBucketACL with the parameters below :")
 		print(" - container : "+ args.container)
 		print(" - ACL : "+ args.ACL)
 		print(" - client : "+ config['client'])
 		print(" - namespace : "+ config['AccountClientNamespace'])
 		print(" - endpoint : "+ config['awsEndpointUrl'])
 		input("Press Enter to continue...")
-		fonctions.putACL(args.container,args.ACL)
+		fonctions.putBucketACL(args.container,args.ACL)
+
+	elif(args.method=="get_file_ACL"): #get the Access Control List of a file
+		print("Running the function GetObjectACL with the parameters below :")
+		print(" - container : "+ args.container)
+		print(" - filename : "+ args.filename)
+		print(" - client : "+ config['client'])
+		print(" - namespace : "+ config['AccountClientNamespace'])
+		print(" - endpoint : "+ config['awsEndpointUrl'])
+		input("Press Enter to continue...")
+		fonctions.getObjectACL(args.container,args.filename)
+
+	elif(args.method=="put_file_ACL"): #modify the Access Control List of a file
+		print("Running the function PutObjectACL with the parameters below :")
+		print(" - container : "+ args.container)
+		print(" - filename : "+ args.filename)
+		print(" - ACL : "+ args.ACL)
+		print(" - client : "+ config['client'])
+		print(" - namespace : "+ config['AccountClientNamespace'])
+		print(" - endpoint : "+ config['awsEndpointUrl'])
+		input("Press Enter to continue...")
+		fonctions.putObjectACL(args.container,args.filename, args.ACL)
 
 	elif(args.method=="get_retention"): #get the retention policy of an object
 		print("Running the function GetRetention with the parameters below :")
