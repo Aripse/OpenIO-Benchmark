@@ -138,13 +138,22 @@ def addContainer(container, newACL='private'):
 
 
 #function to get the Acess Control List policy of a container
-def getACL(container):
+def getBucketACL(container):
     bucket_acl = s3_client.get_bucket_acl(Bucket=container)
     print(bucket_acl)
 
 #function to modify the Acess Control List policy of a container
-def putACL(container,newACL):
+def putBucketACL(container,newACL):
     bucket_acl = s3_client.put_bucket_acl(ACL=newACL, Bucket=container)
+
+#function to get the Acess Control List policy of a file
+def getObjectACL(container,filename):
+    bucket_acl = s3_client.get_object_acl(Bucket=container, Key= filename)
+    print(bucket_acl)
+
+#function to modify the Acess Control List policy of a file
+def putObjectACL(container,filename, newACL):
+    bucket_acl = s3_client.put_object_acl(ACL=newACL, Bucket=container, Key= filename)
 
 #function to get the retention policy of an object
 def getRetention(container, filename):
