@@ -155,24 +155,24 @@ def putBucketACL(container,newACL):
 
 #function to get the Acess Control List policy of a file
 def getObjectACL(container,filename):
-    bucket_acl = s3_client.get_object_acl(Bucket=container, Key= filename)
-    print(bucket_acl)
+    object_acl = s3_client.get_object_acl(Bucket=container, Key= filename)
+    print(object_acl)
 
 #function to modify the Acess Control List policy of a file
 def putObjectACL(container,filename, newACL):
     if newACL=='private' or newACL=='public-read' or newACL=='public-read-write' or newACL=='authenticated-read' or newACL=='bucket-owner-read' or newACL=='bucket-owner-full-control':
-          bucket_acl = s3_client.put_object_acl(ACL=newACL, Bucket=container, Key= filename)
+          object_acl = s3_client.put_object_acl(ACL=newACL, Bucket=container, Key= filename)
     else:
           print("ACL argument is not valid. It must be 'private'|'public-read'|'public-read-write'|'authenticated-read'|'aws-exec-read'|'bucket-owner-read'|'bucket-owner-full-control' for an object.")
 
 #function to get the retention policy of an object
 def getRetention(container, filename):
-    bucket_retention = s3_client.get_object_retention(Bucket=container, Key= filename)
-    print(bucket_retention)
+    object_retention = s3_client.get_object_retention(Bucket=container, Key= filename)
+    print(object_retention)
 
 #function to modify the retention policy of an object
 def putRetention(container, filename, retention):
-    bucket_retention = s3_client.put_object_retention(Bucket=container, Key= filename,
+    object_retention = s3_client.put_object_retention(Bucket=container, Key= filename,
     Retention={
         'Mode': 'GOVERNANCE',
         'RetainUntilDate': datetime.today()+timedelta(retention)
