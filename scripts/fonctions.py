@@ -134,7 +134,10 @@ def elasticUploadFolder(container, index, retention=0):
 
 #function to create a container
 def addContainer(container, newACL='private'):
-    s3_client.create_bucket(ACL=newACL, Bucket=container)
+    if newACL=='private' or newACL=='public-read' or newACL=='public-read-write' or newACL=='authenticated-read':
+          s3_client.create_bucket(ACL=newACL, Bucket=container)
+    else:
+          print("ACL argument is not valid. It must be 'private'|'public-read'|'public-read-write'|'authenticated-read' for a container.")
 
 
 #function to get the Acess Control List policy of a container
@@ -144,7 +147,11 @@ def getBucketACL(container):
 
 #function to modify the Acess Control List policy of a container
 def putBucketACL(container,newACL):
-    bucket_acl = s3_client.put_bucket_acl(ACL=newACL, Bucket=container)
+    if newACL=='private' or newACL=='public-read' or newACL=='public-read-write' or newACL=='authenticated-read':
+          bucket_acl = s3_client.put_bucket_acl(ACL=newACL, Bucket=container)
+    else:
+          print("ACL argument is not valid. It must be 'private'|'public-read'|'public-read-write'|'authenticated-read' for a container.")
+
 
 #function to get the Acess Control List policy of a file
 def getObjectACL(container,filename):
@@ -153,7 +160,10 @@ def getObjectACL(container,filename):
 
 #function to modify the Acess Control List policy of a file
 def putObjectACL(container,filename, newACL):
-    bucket_acl = s3_client.put_object_acl(ACL=newACL, Bucket=container, Key= filename)
+    if newACL=='private' or newACL=='public-read' or newACL=='public-read-write' or newACL=='authenticated-read' or newACL=='bucket-owner-read' or newACL=='bucket-owner-full-control':
+          bucket_acl = s3_client.put_object_acl(ACL=newACL, Bucket=container, Key= filename)
+    else:
+          print("ACL argument is not valid. It must be 'private'|'public-read'|'public-read-write'|'authenticated-read'|'aws-exec-read'|'bucket-owner-read'|'bucket-owner-full-control' for an object.")
 
 #function to get the retention policy of an object
 def getRetention(container, filename):
