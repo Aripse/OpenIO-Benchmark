@@ -52,7 +52,7 @@ parser.add_argument("--index", type=str, nargs='?', help="give specific index")
 
 #The Access Control List you want to put on a container/object.
 parser.add_argument("--ACL", type=str, nargs='?',
-help="The Access Control List you want to put on a container/object. It must be 'private'|'public-read'|'public-read-write'|'authenticated-read' for a container. It must be 'private'|'public-read'|'public-read-write'|'authenticated-read'|'aws-exec-read'|'bucket-owner-read'|'bucket-owner-full-control' for an object.")
+help="The Access Control List you want to put on a container/object. It must be 'private'|'public-read'|'public-read-write'|'authenticated-read' for a container. It must be 'private'|'public-read'|'public-read-write'|'authenticated-read'|'bucket-owner-read'|'bucket-owner-full-control' for an object.")
 
 #The number of days from today until this Object Lock Retention will expire
 parser.add_argument("--retention", type=int, nargs='?',
@@ -138,6 +138,7 @@ else:
 	elif(args.method == "elastic"): #copy an entire folder from ElasticSearch to the OpenIO container
 		print("Running the function elasticUploadFolder with the parameters below :")
 		print(" - container : "+ args.container)
+		print(" - index : "+ args.index)
 		print(" - client : "+ config['client'])
 		if args.retention:
 				print(" - retention :"+ str(args.retention))
@@ -239,3 +240,9 @@ else:
 		print("- retrieve : to get every file from a container outside the container")
 		print("- elastic : to put every file from an elastic index inside the container")
 		print("- create_container : to create an empty container")
+		print("- get_container_ACL : to get the Access Control List of a container")
+		print("- put_container_ACL : to modify the Access Control List of a container")
+		print("- get_file_ACL : to get the Access Control List of a file")
+		print("- put_file_ACL : to modify the Access Control List of a file")
+		print("- get_retention : to get the retention policy of an object")
+		print("- put_retention : to modify the retention policy of an object")
