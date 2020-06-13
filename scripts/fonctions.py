@@ -3,7 +3,6 @@
 #import of natives modules and script containing ElasticSearch
 import os
 from datetime import timedelta, datetime
-import pytz
 
 
 #import elasticWithAgrs
@@ -15,6 +14,14 @@ except ImportError:
     input("Cannot load module eventlet. Press enter to install the package eventlet or Ctrl+c to quit the program")
     os.system("pip3 install --user eventlet")
     import eventlet
+
+try:
+    import pytz
+except ImportError:
+    input("Cannot load module pytz. Press enter to install the package pytz or Ctrl+c to quit the program")
+    os.system("pip3 install --user pytz")
+    import pytz
+
 
 #try:
 #    import urllib3
