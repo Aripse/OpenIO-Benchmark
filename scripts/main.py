@@ -290,7 +290,7 @@ else:
 		print("An argument method must be thrown.")
 
 	else: #display of the "help" menu
-		print("Invalid argument" + args.method+ "for method. Please try with one of the below possibilities :")
+		print("Invalid argument " + args.method+ " for method. Please try with one of the below possibilities :")
 		print("- add : to add a specific file in a container")
 		print("- delete : to delete a specific file inside a container")
 		print("- copy : to copy an entire folder inside a container")
