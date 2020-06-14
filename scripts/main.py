@@ -286,7 +286,7 @@ else:
 			fonctions.putRetention(args.container,args.filename,args.retention)
 
 
-	elif(args.method.length == 0): #error handling: no method argument
+	elif(len(args.method) == 0): #error handling: no method argument
 		print("An argument method must be thrown.")
 
 	else: #display of the "help" menu
