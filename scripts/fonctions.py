@@ -54,9 +54,16 @@ except ImportError:
 try:
     import boto3
 except ImportError:
-    input("Cannot load module ObjectStorageApi from oio. Press enter to install the package oio or Ctrl+c to quit the program")
+    input("Cannot load module boto3. Press enter to install the package boto3 or Ctrl+c to quit the program")
     os.system("pip3 install --user boto3")
     import boto3
+
+try:
+    import botocore
+except ImportError:
+    input("Cannot load module botocore. Press enter to install the package botocore or Ctrl+c to quit the program")
+    os.system("pip3 install --user botocore")
+    import botocore
 
 #read variables from configuration file
 with open("./config.yaml", "r") as ymlfile:
@@ -69,15 +76,17 @@ s3_client = session.client(service_name='s3', aws_access_key_id=config['awsAcces
 def addFileInContainer(container, path, retention=0):
     fileName = os.path.basename(path)
 
-    #try/except
-    s3_client.upload_file(Filename= path, Bucket=container, Key= fileName)
-    if retention !=0 :
-    	s3_client.put_object_retention(Bucket=container, Key= fileName, 
-    	Retention={
-        	'Mode': 'GOVERNANCE',
-       		'RetainUntilDate': datetime.today()+timedelta(retention)
-    	}
-)
+    try:
+        s3_client.upload_file(Filename= path, Bucket=container, Key= fileName)
+        if retention !=0 :
+    	    s3_client.put_object_retention(Bucket=container, Key= fileName, 
+    	    Retention={
+        	    'Mode': 'GOVERNANCE',
+       		    'RetainUntilDate': datetime.today()+timedelta(retention)
+    	            }
+            )
+    except FileNotFoundError:
+        print("No such file : "+path)
 
 
 #function to delete a file in the container
@@ -86,16 +95,19 @@ def deleteFileInContainer(container, fileName):
 
 #function to copy an entire folder from sever to the OpenIO container
 def uploadFolder( container, folder_path, retention=0):
-    for file_name_ext in os.listdir(folder_path):
-        file_path_ext=str(folder_path)+'/'+file_name_ext
-        s3_client.upload_file(Filename= file_path_ext, Bucket= container, Key=file_name_ext)
-        if retention !=0 :
+    try:
+        for file_name_ext in os.listdir(folder_path):
+            file_path_ext=str(folder_path)+'/'+file_name_ext
+            s3_client.upload_file(Filename= file_path_ext, Bucket= container, Key=file_name_ext)
+            if retention !=0 :
                 s3_client.put_object_retention(Bucket=container, Key=file_name_ext, 
     		Retention={
         		'Mode': 'GOVERNANCE',
        			'RetainUntilDate': datetime.today()+timedelta(retention)
     		}
-	)
+	    )
+    except FileNotFoundError:
+        print("No such directory : "+folder_path)
 
 #function to list all data inside a container
 def listDataForAGivenPeriod( container, period):
@@ -142,7 +154,18 @@ def elasticUploadFolder(container, index, retention=0):
 #function to create a container
 def addContainer(container, newACL='private'):
     if newACL=='private' or newACL=='public-read' or newACL=='public-read-write' or newACL=='authenticated-read':
-          s3_client.create_bucket(ACL=newACL, Bucket=container)
+          try:
+               s3_client.create_bucket(ACL=newACL, Bucket=container)
+          except s3_client.exceptions.BucketAlreadyExists:
+               print("Bucket "+container+" already exists!")
+          except s3_client.exceptions.ClientError:
+                print("Bucket name is not valid.")
+                print("Bucket names must be between 3 and 63 characters long.")
+                print("Bucket names can consist only of lowercase letters, numbers, dots (.), and hyphens (-).")
+                print("Bucket names must begin and end with a letter or number.")
+                print("Bucket names must not be formatted as an IP address (for example, 192.168.5.4).")
+                print("Bucket names can't begin with xn-- (for buckets created after February 2020).")
+
     else:
           print("ACL argument is not valid. It must be 'private'|'public-read'|'public-read-write'|'authenticated-read' for a container.")
 
@@ -174,8 +197,12 @@ def putObjectACL(container,filename, newACL):
 
 #function to get the retention policy of an object
 def getRetention(container, filename):
-    object_retention = s3_client.get_object_retention(Bucket=container, Key= filename)
-    print(object_retention)
+    try:
+          object_retention = s3_client.get_object_retention(Bucket=container, Key= filename)
+          print(object_retention)
+    except botocore.parsers.ResponseParserError:
+          print("No retention policy for this object")
+   
 
 #function to modify the retention policy of an object
 def putRetention(container, filename, retention):
@@ -186,4 +213,3 @@ def putRetention(container, filename, retention):
     }
 
 )
-
