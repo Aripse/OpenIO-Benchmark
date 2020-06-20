@@ -89,9 +89,13 @@ def addFileInContainer(container, path, retention=0):
         print("No such file : "+path)
 
 
+
 #function to delete a file in the container
 def deleteFileInContainer(container, fileName):
-    s3_client.delete_object(Bucket=container, Key= fileName)
+    try:
+         s3_client.delete_object(Bucket=container, Key= fileName)
+    except s3_client.exceptions.NoSuchBucket:
+          print("No container named "+container+".")
 
 #function to copy an entire folder from sever to the OpenIO container
 def uploadFolder( container, folder_path, retention=0):
@@ -109,24 +113,35 @@ def uploadFolder( container, folder_path, retention=0):
     except FileNotFoundError:
         print("No such directory : "+folder_path)
 
+
+#function to list all containers
+def listBuckets():
+    print(s3_client.list_buckets())
+
 #function to list all data inside a container
 def listDataForAGivenPeriod( container, period):
     objects = []
     t = timedelta(days=period)
     utc=pytz.UTC
     today = utc.localize(datetime.today())
-    for element in s3_client.list_objects(Bucket=container)['Contents']:
-        creationDate = element['LastModified'].replace(tzinfo=utc)
-        duration = today - t
-        if(creationDate >= duration):
-            objects.append(element)
+    try:
+        for element in s3_client.list_objects(Bucket=container)['Contents']:
+           creationDate = element['LastModified'].replace(tzinfo=utc)
+           duration = today - t
+           if(creationDate >= duration):
+              objects.append(element)
 
-    print(objects)
+        print(objects)
+    except s3_client.exceptions.NoSuchBucket:
+          print("No container named "+container+".")
 
 #function to retrieve all data from a container
 def retrieveAllDataFromContainer(container):
-    for element in s3_client.list_objects(Bucket=container)['Contents']:
-        s3_client.download_file(Bucket=container, Key=element['Key'], Filename= element['Key'])
+    try:
+         for element in s3_client.list_objects(Bucket=container)['Contents']:
+              s3_client.download_file(Bucket=container, Key=element['Key'], Filename= element['Key'])
+    except s3_client.exceptions.NoSuchBucket:
+          print("No container named "+container+".")
 
 #function to copy an entire folder from ElasticSearch to the OpenIO container
 def elasticUploadFolder(container, index, retention=0):
@@ -172,26 +187,42 @@ def addContainer(container, newACL='private'):
 
 #function to get the Acess Control List policy of a container
 def getBucketACL(container):
-    bucket_acl = s3_client.get_bucket_acl(Bucket=container)
-    print(bucket_acl)
+    try:
+          bucket_acl = s3_client.get_bucket_acl(Bucket=container)
+          print(bucket_acl)
+    except s3_client.exceptions.NoSuchBucket:
+          print("No container named "+container+".")
 
 #function to modify the Acess Control List policy of a container
 def putBucketACL(container,newACL):
     if newACL=='private' or newACL=='public-read' or newACL=='public-read-write' or newACL=='authenticated-read':
-          bucket_acl = s3_client.put_bucket_acl(ACL=newACL, Bucket=container)
+          try:
+                bucket_acl = s3_client.put_bucket_acl(ACL=newACL, Bucket=container)
+          except s3_client.exceptions.NoSuchBucket:
+                print("No container named "+container+".")
     else:
           print("ACL argument is not valid. It must be 'private'|'public-read'|'public-read-write'|'authenticated-read' for a container.")
 
 
 #function to get the Acess Control List policy of a file
 def getObjectACL(container,filename):
-    object_acl = s3_client.get_object_acl(Bucket=container, Key= filename)
-    print(object_acl)
+    try:
+          object_acl = s3_client.get_object_acl(Bucket=container, Key= filename)
+          print(object_acl)
+    except s3_client.exceptions.NoSuchBucket:
+          print("No container named "+container+".")
+    except s3_client.exceptions.NoSuchKey:
+          print("No file named "+filename+" in the container "+container+".")
 
 #function to modify the Acess Control List policy of a file
 def putObjectACL(container,filename, newACL):
     if newACL=='private' or newACL=='public-read' or newACL=='public-read-write' or newACL=='authenticated-read' or newACL=='bucket-owner-read' or newACL=='bucket-owner-full-control':
-          object_acl = s3_client.put_object_acl(ACL=newACL, Bucket=container, Key= filename)
+          try:
+                object_acl = s3_client.put_object_acl(ACL=newACL, Bucket=container, Key= filename)
+          except s3_client.exceptions.NoSuchKey:
+                print("No file named "+filename+" in the container "+container+".")
+          except s3_client.exceptions.NoSuchBucket:
+                print("No container named "+container+".")
     else:
           print("ACL argument is not valid. It must be 'private'|'public-read'|'public-read-write'|'authenticated-read'|'aws-exec-read'|'bucket-owner-read'|'bucket-owner-full-control' for an object.")
 
@@ -202,14 +233,22 @@ def getRetention(container, filename):
           print(object_retention)
     except botocore.parsers.ResponseParserError:
           print("No retention policy for this object")
+    except s3_client.exceptions.NoSuchBucket:
+          print("No container named "+container+".")
+    except s3_client.exceptions.NoSuchKey:
+          print("No file named "+filename+" in the container "+container+".")
    
 
 #function to modify the retention policy of an object
 def putRetention(container, filename, retention):
-    object_retention = s3_client.put_object_retention(Bucket=container, Key= filename,
-    Retention={
-        'Mode': 'GOVERNANCE',
-        'RetainUntilDate': datetime.today()+timedelta(retention)
-    }
-
-)
+    try:
+          object_retention = s3_client.put_object_retention(Bucket=container, Key= filename,
+          Retention={
+             'Mode': 'GOVERNANCE',
+             'RetainUntilDate': datetime.today()+timedelta(retention)
+           }
+           )
+    except s3_client.exceptions.NoSuchBucket:
+          print("No container named "+container+".")
+    except s3_client.exceptions.NoSuchKey:
+          print("No file named "+filename+" in the container "+container+".")
