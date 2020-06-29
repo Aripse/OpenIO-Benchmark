@@ -61,9 +61,25 @@ help="The number of days from today until this Object Lock Retention will expire
 args=parser.parse_args()
 
 #verification of the presence of the argument "container" and the configuration variable "AccountClientNamespace" then launching of the function according to the argument "method"
-if not config['AccountClientNamespace']:
-	print("The AccountClientNamespace attribute does not exist in the configuration file. Please add it.")
-else:
+
+if not(args.method):
+	print("You need to specify a method argument from the methods above :")
+	print("- add : to add a specific file in a container")
+	print("- delete : to delete a specific file inside a container")
+	print("- copy : to copy an entire folder inside a container")
+	print("- list_containers : to list all containers")
+	print("- list_objects : to list every items inside a container for a given period")
+	print("- retrieve : to get every file from a container outside the container")
+	print("- elastic : to put every file from an elastic index inside the container")
+	print("- create_container : to create an empty container")
+	print("- get_container_ACL : to get the Access Control List of a container")
+	print("- put_container_ACL : to modify the Access Control List of a container")
+	print("- get_file_ACL : to get the Access Control List of a file")
+	print("- put_file_ACL : to modify the Access Control List of a file")
+	print("- get_retention : to get the retention policy of an object")
+	print("- put_retention : to modify the retention policy of an object")
+
+else :
 	if(args.method == "add"):
 		if not args.container:
 			print("The function AddFileInContainer needs a container argument to work. Please try again..")
@@ -75,7 +91,6 @@ else:
 			print(" - path : "+ args.path)
 			if args.retention:
 				print(" - retention :"+ str(args.retention))
-			print(" - namespace : "+ config['AccountClientNamespace'])
 			input("Press Enter to continue...")
 			if args.retention:
 				fonctions.addFileInContainer(args.container, args.path, args.retention)
@@ -90,9 +105,7 @@ else:
 		else:
 			print("Running the function DeleteFileInContainer with the parameters below :")
 			print(" - container : "+ args.container)
-			print(" - client : "+ config['client'])
 			print(" - filename : "+ args.filename)
-			print(" - namespace : "+ config['AccountClientNamespace'])
 			print(" - endpoint : "+ config['awsEndpointUrl'])
 			input("Press Enter to continue...")
 			fonctions.deleteFileInContainer(args.container, args.filename)
@@ -105,11 +118,9 @@ else:
 		else:
 			print("Running the function UploadFolder with the parameters below :")
 			print(" - container : "+ args.container)
-			print(" - client : "+ config['client'])
 			print(" - path : "+ args.path)
 			if args.retention:
 				print(" - retention :"+ str(args.retention))
-			print(" - namespace : "+ config['AccountClientNamespace'])
 			print(" - endpoint : "+ config['awsEndpointUrl'])
 			input("Press Enter to continue...")
 			if args.retention:
@@ -119,9 +130,7 @@ else:
 
 	elif(args.method == "list_containers"): #list all containers
 		print("Running the function ListDataForAGivenPeriod with the parameters below :")
-		print(" - client : "+ config['client'])
 		print(" - period : "+ str(args.period))
-		print(" - namespace : "+ config['AccountClientNamespace'])
 		print(" - endpoint : "+ config['awsEndpointUrl'])
 		input("Press Enter to continue...")
 		fonctions.listBuckets()
@@ -134,9 +143,7 @@ else:
 		else:
 			print("Running the function ListDataForAGivenPeriod with the parameters below :")
 			print(" - container : "+ args.container)
-			print(" - client : "+ config['client'])
 			print(" - period : "+ str(args.period))
-			print(" - namespace : "+ config['AccountClientNamespace'])
 			print(" - endpoint : "+ config['awsEndpointUrl'])
 			input("Press Enter to continue...")
 			fonctions.listDataForAGivenPeriod( args.container, args.period)
@@ -147,8 +154,6 @@ else:
 		else:
 			print("Running the function RetrieveAllDataFromContainer with the parameters below :")
 			print(" - container : "+ args.container)
-			print(" - client : "+ config['client'])
-			print(" - namespace : "+ config['AccountClientNamespace'])
 			print(" - endpoint : "+ config['awsEndpointUrl'])
 			input("Press Enter to continue...")
 			fonctions.retrieveAllDataFromContainer( args.container)
@@ -162,10 +167,8 @@ else:
 			print("Running the function elasticUploadFolder with the parameters below :")
 			print(" - container : "+ args.container)
 			print(" - index : "+ args.index)
-			print(" - client : "+ config['client'])
 			if args.retention:
 					print(" - retention :"+ str(args.retention))
-			print(" - namespace : "+ config['AccountClientNamespace'])
 			print(" - endpoint : "+ config['awsEndpointUrl'])
 			print(" - elasticsearchDomain :" + config["elasticsearchDomain"])
 			print(" - elasticsearchPort :" + config["elasticsearchPort"])
@@ -183,8 +186,6 @@ else:
 			print(" - container : "+ args.container)
 			if args.ACL:
 					print(" - ACL :"+ args.ACL)
-			print(" - client : "+ config['client'])
-			print(" - namespace : "+ config['AccountClientNamespace'])
 			print(" - endpoint : "+ config['awsEndpointUrl'])
 			input("Press Enter to continue...")
 			if args.ACL:
@@ -198,8 +199,6 @@ else:
 		else:
 			print("Running the function getBucketACL with the parameters below :")
 			print(" - container : "+ args.container)
-			print(" - client : "+ config['client'])
-			print(" - namespace : "+ config['AccountClientNamespace'])
 			print(" - endpoint : "+ config['awsEndpointUrl'])
 			input("Press Enter to continue...")
 			fonctions.getBucketACL(args.container)
@@ -213,8 +212,6 @@ else:
 			print("Running the function putBucketACL with the parameters below :")
 			print(" - container : "+ args.container)
 			print(" - ACL : "+ args.ACL)
-			print(" - client : "+ config['client'])
-			print(" - namespace : "+ config['AccountClientNamespace'])
 			print(" - endpoint : "+ config['awsEndpointUrl'])
 			input("Press Enter to continue...")
 			fonctions.putBucketACL(args.container,args.ACL)
@@ -228,8 +225,6 @@ else:
 			print("Running the function getObjectACL with the parameters below :")
 			print(" - container : "+ args.container)
 			print(" - filename : "+ args.filename)
-			print(" - client : "+ config['client'])
-			print(" - namespace : "+ config['AccountClientNamespace'])
 			print(" - endpoint : "+ config['awsEndpointUrl'])
 			input("Press Enter to continue...")
 			fonctions.getObjectACL(args.container,args.filename)
@@ -246,8 +241,6 @@ else:
 			print(" - container : "+ args.container)
 			print(" - filename : "+ args.filename)
 			print(" - ACL : "+ args.ACL)
-			print(" - client : "+ config['client'])
-			print(" - namespace : "+ config['AccountClientNamespace'])
 			print(" - endpoint : "+ config['awsEndpointUrl'])
 			input("Press Enter to continue...")
 			fonctions.putObjectACL(args.container,args.filename, args.ACL)
@@ -260,9 +253,7 @@ else:
 		else:
 			print("Running the function getRetention with the parameters below :")
 			print(" - container : "+ args.container)
-			print(" - client : "+ config['client'])
 			print(" - filename : "+ args.filename)
-			print(" - namespace : "+ config['AccountClientNamespace'])
 			print(" - endpoint : "+ config['awsEndpointUrl'])
 			input("Press Enter to continue...")
 			fonctions.getRetention(args.container,args.filename)
@@ -277,17 +268,11 @@ else:
 		else:
 			print("Running the function putRetention with the parameters below :")
 			print(" - container : "+ args.container)
-			print(" - client : "+ config['client'])
 			print(" - filename : "+ args.filename)
 			print(" - retention :"+ str(args.retention))
-			print(" - namespace : "+ config['AccountClientNamespace'])
 			print(" - endpoint : "+ config['awsEndpointUrl'])
 			input("Press Enter to continue...")
 			fonctions.putRetention(args.container,args.filename,args.retention)
-
-
-	elif(len(args.method) == 0): #error handling: no method argument
-		print("An argument method must be thrown.")
 
 	else: #display of the "help" menu
 		print("Invalid argument " + args.method+ " for method. Please try with one of the below possibilities :")
