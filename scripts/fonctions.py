@@ -38,13 +38,6 @@ except ImportError:
         import yaml
 
 try:
-    from oio import ObjectStorageApi
-except ImportError:
-        input("Cannot load module ObjectStorageApi from oio. Press enter to install the package oio or Ctrl+c to quit the program")
-        os.system("pip3 install --user git+https://github.com/open-io/oio-sds.git@6.1.0.0a0")
-        from oio import ObjectStorageApi
-
-try:
     from elasticsearch import Elasticsearch, helpers
 except ImportError:
     input("Cannot load module Elasticsearch. Press enter to install the package Elasticsearch or Ctrl+c to quit the program")
