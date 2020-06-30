@@ -9,7 +9,7 @@ services:
       - /Users/brice21/Desktop/OpenIO-Benchmark/scripts:/scripts
     ports :
       - "6007:6007"
-    command: bash -c "yum install python3 -y ; pip3 install git+https://github.com/open-io/oio-sds.git@master ; pip3 install eventlet ; pip3 install urllib3; pip3 install pyyaml; sleep 40; /bin/bash /openio-docker-init.sh"
+    command: bash -c "sleep 40; /bin/bash /openio-docker-init.sh"
 
   openio_2:
     container_name: "node2"
