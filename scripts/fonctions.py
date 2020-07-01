@@ -5,7 +5,7 @@ import os
 from datetime import timedelta, datetime
 
 
-#import elasticWithAgrs
+# import elasticWithAgrs
 
 #import of OpenIO, ElasticSearch and other modules with import test
 try:
@@ -67,6 +67,7 @@ s3_client = session.client(service_name='s3', aws_access_key_id=config['awsAcces
 
 #function to add a file in the container
 def addFileInContainer(container, path, retention=0):
+    """Function called to add a file (thanks to the path parameter) in a defined container"""
     fileName = os.path.basename(path)
 
     try:
@@ -81,10 +82,23 @@ def addFileInContainer(container, path, retention=0):
     except FileNotFoundError:
         print("No such file : "+path)
 
+def test_connection( client):
+    try:
+        # use the JSON library's dump() method for indentation
+        info = client.info()
+        # pass client object to info() method
+        print ("Elasticsearch client info():", info)
+    except ConnectionError as err:
+        # print ConnectionError for Elasticsearch
+        print ("\nElasticsearch info() ERROR:", err)
+        print ("\nThe client host:", config['elasticsearchDomain'], "is invalid or cluster is not running")
+        # change the client's value to 'None' if ConnectionError
+        client = None
 
 
 #function to delete a file in the container
 def deleteFileInContainer(container, fileName):
+    """Function called to delete a certain file (thanks to its name) in a defined container"""
     try:
          s3_client.delete_object(Bucket=container, Key= fileName)
     except s3_client.exceptions.NoSuchBucket:
@@ -92,6 +106,7 @@ def deleteFileInContainer(container, fileName):
 
 #function to copy an entire folder from sever to the OpenIO container
 def uploadFolder( container, folder_path, retention=0):
+    """Function called to upload an entire folder (thanks to its path) from your computer to a defined container"""
     try:
         for file_name_ext in os.listdir(folder_path):
             file_path_ext=str(folder_path)+'/'+file_name_ext
@@ -113,6 +128,7 @@ def listBuckets():
 
 #function to list all data inside a container
 def listDataForAGivenPeriod( container, period):
+    """Function called to list all data that a container has for a given period of time in days"""
     objects = []
     t = timedelta(days=period)
     utc=pytz.UTC
@@ -130,6 +146,8 @@ def listDataForAGivenPeriod( container, period):
 
 #function to retrieve all data from a container
 def retrieveAllDataFromContainer(container):
+    """Function called to retrieve and copy in the folder of the python executable all the files contained in a
+    certain container """
     try:
          for element in s3_client.list_objects(Bucket=container)['Contents']:
               s3_client.download_file(Bucket=container, Key=element['Key'], Filename= element['Key'])
@@ -138,21 +156,22 @@ def retrieveAllDataFromContainer(container):
 
 #function to copy an entire folder from ElasticSearch to the OpenIO container
 def elasticUploadFolder(container, index, retention=0):
+    """Function called to copy an entire folder  """
     if os.name == 'posix':
         slash = "/" # for Linux and macOS
     else:
         slash = chr(92) # '\' for Windows
     host = str(config['elasticsearchDomain']) + ":" + str(config['elasticsearchPort'])
     client = Elasticsearch(host)
-    # elasticWithAgrs.test_connection(config['elasticsearchDomain'], config['elasticsearchPort'], client)
+    test_connection(client)
     response = client.search(index=index, body={}, size=100)
     elastic_docs = response["hits"]["hits"]
     for num, doc in enumerate(elastic_docs):
         # get _source data dict from document
         source_data = doc["_source"]
-        s3_client.upload_file(Filename= source_data["file_name"],Bucket=container, Key= source_data["file_name"])
+        s3_client.upload_file(Filename= source_data[config['elasticsearchFilenameAttribut']],Bucket=container, Key= source_data[config['elasticsearchFilenameAttribut']])
         if retention !=0 :
-                s3_client.put_object_retention(Bucket=container, Key= source_data["file_name"], 
+                s3_client.put_object_retention(Bucket=container, Key= source_data[config['elasticsearchFilenameAttribut']], 
     		Retention={
         		'Mode': 'GOVERNANCE',
        			'RetainUntilDate': datetime.today()+timedelta(retention)
